@@ -1,0 +1,22 @@
+.rules-list {
+  width: 80%;
+  margin: 1rem auto;
+}
+
+.rules-list .pure-table {
+  margin: auto;
+}
+
+.rule-name {
+  text-align: left;
+}
+
+.rule-actions {
+  text-align: center;
+  white-space: nowrap;
+  width: 10%;
+}
+
+.create-new-rule-button {
+  margin-top: 1rem;
+}

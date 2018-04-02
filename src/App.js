@@ -1,19 +1,37 @@
 import React, { Component } from 'react';
-import logo from './images/logo.svg';
-import './css/App.css';
+import {
+  BrowserRouter as Router,
+  Route,
+  Redirect,
+  Switch
+} from 'react-router-dom';
+import RulesList from './components/RulesList';
+import Rule from './components/Rule';
+import { init } from '@rematch/core';
+import rules from './models/rules';
+import { Provider } from 'react-redux';
+
+const store = init({
+  models: {
+    rules: rules
+  }
+});
 
 class App extends Component {
   render() {
     return (
-      <div className="App">
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <h1 className="App-title">Welcome to React</h1>
-        </header>
-        <p className="App-intro">
-          To get started, edit <code>src/App.js</code> and save to reload.
-        </p>
-      </div>
+      <Provider store={store}>
+        <Router>
+          <div>
+            <Switch>
+              <Route exact path="/" render={() => <Redirect to="/rules" />} />
+              <Route exact path="/rules" component={RulesList} />
+              <Route path="/rules/new" component={Rule} />
+              <Route path="/rules/:id" component={Rule} />
+            </Switch>
+          </div>
+        </Router>
+      </Provider>
     );
   }
 }
