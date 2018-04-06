@@ -1,0 +1,13 @@
+.component-edit-container {
+  height: 100%;
+}
+
+.component-edit-sidebar {
+  background: #ededed;
+  height: 100%;
+  padding: 0 2rem;
+}
+
+.component-edit-sidebar select {
+  width: 100%;
+}

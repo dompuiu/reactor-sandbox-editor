@@ -3,8 +3,9 @@
   margin: 1rem auto;
 }
 
-.rules-list .pure-table {
+.rule-list-table {
   margin: auto;
+  width: 100%;
 }
 
 .rule-name {

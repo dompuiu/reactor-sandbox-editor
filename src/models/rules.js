@@ -42,6 +42,9 @@ const rules = fromJS([
 export default {
   state: rules, // initial state
   reducers: {
+    addRule(state, payload) {
+      return state.push(payload.rule);
+    },
     saveRule(state, payload) {
       return state.update(payload.id, item => payload.rule);
     },
