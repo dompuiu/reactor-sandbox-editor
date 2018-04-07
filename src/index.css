@@ -10,6 +10,17 @@ body,
   height: 100%;
 }
 
+.big-text {
+  text-align: center;
+  padding: 2rem;
+  font-size: 1.4rem;
+  color: #777;
+}
+
+.hide {
+  display: none;
+}
+
 .button-success,
 .button-error,
 .button-warning,

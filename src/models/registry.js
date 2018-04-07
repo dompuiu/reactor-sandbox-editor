@@ -1,12 +1,8 @@
 import { fromJS } from 'immutable';
+import environment from './environment';
 
 const registry = fromJS({
-  environment: {
-    server: {
-      host: 'http://localhost',
-      port: 3000
-    }
-  },
+  environment: environment,
   components: {
     events: {
       'sandbox/pageTop.js': {

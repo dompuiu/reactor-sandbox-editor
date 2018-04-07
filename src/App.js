@@ -1,12 +1,9 @@
 import React, { Component } from 'react';
 import { init } from '@rematch/core';
 import { Provider } from 'react-redux';
-import {
-  Redirect,
-  BrowserRouter as Router,
-  Route,
-  Switch
-} from 'react-router-dom';
+import { HashRouter as Router, Route, Switch } from 'react-router-dom';
+
+import Main from './components/Main';
 import RulesList from './components/RulesList';
 import RuleEdit from './components/RuleEdit';
 import ComponentEdit from './components/ComponentEdit';
@@ -14,9 +11,12 @@ import registry from './models/registry';
 import currentIframe from './models/currentIframe';
 import currentRule from './models/currentRule';
 import rules from './models/rules';
+import initialize from './models/initialize';
+import { dispatch } from '@rematch/core';
 
 const store = init({
   models: {
+    initialize: initialize,
     rules: rules,
     registry: registry,
     currentIframe: currentIframe,
@@ -24,13 +24,15 @@ const store = init({
   }
 });
 
+dispatch({ type: 'initialize/loadContainer' });
+
 class App extends Component {
   render() {
     return (
       <Provider store={store}>
-        <Router basename="/editor">
+        <Router>
           <Switch>
-            <Route exact path="/" render={() => <Redirect to="/rules" />} />
+            <Route exact path="/" component={Main} />
             <Route exact path="/rules" component={RulesList} />
             <Route exact path="/rules/:rule_id" component={RuleEdit} />
             <Route
