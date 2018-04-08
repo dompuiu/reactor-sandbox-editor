@@ -10,14 +10,25 @@ export default {
     }
   },
   effects: {
-    async loadContainer(payload, rootState) {
-      const response = await fetch(
-        `${environment.server.host}:${
-          environment.server.port
-        }/editor-container.js`
-      );
-      const data = await response.json();
-      dispatch.rules.setRules(fromJS(data.rules));
+    async loadData(payload, rootState) {
+      const responses = await Promise.all([
+        fetch(
+          `${environment.server.host}:${
+            environment.server.port
+          }/editor-container.js`
+        ),
+        fetch(
+          `${environment.server.host}:${
+            environment.server.port
+          }/editor-registry.js`
+        )
+      ]);
+
+      const containerData = await responses[0].json();
+      const registryData = await responses[1].json();
+
+      dispatch.rules.setRules(fromJS(containerData.rules));
+      dispatch.registry.setRegistry(fromJS(registryData));
       dispatch.initialize.initCompleted();
     }
   }

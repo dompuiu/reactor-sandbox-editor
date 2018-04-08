@@ -13,8 +13,8 @@ const isNewComponent = props => {
 
   return (
     componentId === 'new' ||
-    !props.rules ||
-    componentId >= (props.rules.getIn([ruleId, type]) || List()).size
+    !props.currentRule ||
+    componentId >= (props.currentRule.get(type) || List()).size
   );
 };
 
@@ -44,7 +44,7 @@ const getComponent = props => {
     rule.getIn([type, componentId]) ||
     Map({
       modulePath: '',
-      settings: {}
+      settings: null
     })
   );
 };
@@ -71,7 +71,7 @@ class ComponentEdit extends Component {
   handleComponentTypeChange(event) {
     this.setState({
       component: this.state.component.merge({
-        settings: Map(),
+        settings: null,
         modulePath: event.target.value
       })
     });
@@ -79,15 +79,37 @@ class ComponentEdit extends Component {
 
   componentList() {
     const type = this.props.match.params.type;
+    const componentList = {};
+    const groupList = [];
 
-    return (this.props.registry.getIn(['components', type]) || List())
+    (this.props.registry.getIn(['components', type]) || List())
       .valueSeq()
-      .map(v => (
-        <option
-          value={`${v.get('extensionName')}/${v.get('libPath')}`}
-          key={`optionType${v.get('libPath')}`}
-        >{`${v.get('displayName')} (${v.get('extensionDisplayName')})`}</option>
-      ));
+      .forEach(v => {
+        if (!componentList[v.get('extensionDisplayName')]) {
+          componentList[v.get('extensionDisplayName')] = [];
+        }
+        componentList[v.get('extensionDisplayName')].push(
+          <option
+            value={`${v.get('extensionName')}/${v.get('libPath')}`}
+            key={`optionType${v.get('libPath')}`}
+          >
+            {v.get('displayName')}
+          </option>
+        );
+      });
+
+    Object.keys(componentList).forEach(extenisonDisplayName => {
+      groupList.push(
+        <optgroup
+          key={`optGroupExtension${extenisonDisplayName}`}
+          label={extenisonDisplayName}
+        >
+          {componentList[extenisonDisplayName]}
+        </optgroup>
+      );
+    });
+
+    return groupList;
   }
 
   backLink() {
@@ -107,7 +129,7 @@ class ComponentEdit extends Component {
       .then(([isValid, settings]) => {
         if (isValid) {
           this.props[method]({
-            id: params.componentId,
+            id: params.component_id,
             type: params.type,
             component: this.state.component.merge({ settings: settings })
           });

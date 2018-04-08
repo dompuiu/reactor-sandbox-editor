@@ -24,7 +24,7 @@ const store = init({
   }
 });
 
-dispatch({ type: 'initialize/loadContainer' });
+dispatch({ type: 'initialize/loadData' });
 
 class App extends Component {
   render() {

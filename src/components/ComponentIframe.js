@@ -43,7 +43,7 @@ class ComponentIframe extends Component {
       url: url,
       container: this.dom,
       extensionInitOptions: {
-        settings: this.props.settings.toJS()
+        settings: this.props.settings && this.props.settings.toJS()
       },
       connectionTimeoutDuration: 30000,
       openCodeEditor(options = {}) {},
