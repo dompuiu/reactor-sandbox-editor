@@ -1,6 +1,5 @@
 import React from 'react';
 import List from './List';
-import './RulesList.css';
 import { withRouter } from 'react-router-dom';
 import { connect } from 'react-redux';
 
@@ -9,8 +8,7 @@ const RulesList = ({ rules, deleteRule }) =>
     <List
       items={rules}
       deleteFn={deleteRule}
-      addLink="/rules/new"
-      editLinkPrefix="/rules/"
+      linkPrefix="/rules"
       className="rules-list"
     />
   ) : (

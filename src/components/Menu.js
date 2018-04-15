@@ -20,6 +20,17 @@ const Menu = ({ initialize, match }) => (
             Rules
           </Link>
         </li>
+
+        <li className="pure-menu-item">
+          <Link
+            to="/data_elements"
+            className={`pure-menu-link ${
+              match.path === '/data_elements' ? 'menu-selected' : ''
+            }`}
+          >
+            Data Elements
+          </Link>
+        </li>
       </ul>
     </div>
   </div>

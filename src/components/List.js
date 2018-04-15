@@ -3,10 +3,10 @@ import Menu from './Menu';
 import { Link } from 'react-router-dom';
 import './List.css';
 
-const List = ({ items, deleteFn, className, addLink, editLinkPrefix }) => (
+const List = ({ items, deleteFn, className, addLink, linkPrefix }) => (
   <div>
     <Menu />
-    <div className={className}>
+    <div className={`list-container ${className}`}>
       <table className="pure-table list-table">
         <thead>
           <tr>
@@ -20,7 +20,7 @@ const List = ({ items, deleteFn, className, addLink, editLinkPrefix }) => (
               <td className="list-item-name">{item.get('name')}</td>
               <td className="list-item-actions">
                 <Link
-                  to={`${editLinkPrefix}${i}`}
+                  to={`${linkPrefix}/${i}`}
                   className="button-success pure-button"
                 >
                   Edit
@@ -43,7 +43,7 @@ const List = ({ items, deleteFn, className, addLink, editLinkPrefix }) => (
         </tbody>
       </table>
       <Link
-        to={addLink}
+        to={`${linkPrefix}/new`}
         className="pure-button pure-button-primary create-new-button"
       >
         Add

@@ -28,6 +28,7 @@ export default {
       const registryData = await responses[1].json();
 
       dispatch.rules.setRules(fromJS(containerData.rules));
+      dispatch.dataElements.setDataElements(fromJS(containerData.dataElements));
       dispatch.registry.setRegistry(fromJS(registryData));
       dispatch.initialize.initCompleted();
     }
