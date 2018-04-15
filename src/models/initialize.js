@@ -27,6 +27,9 @@ export default {
       const containerData = await responses[0].json();
       const registryData = await responses[1].json();
 
+      dispatch.extensionConfigurations.setExtensionConfigurations(
+        fromJS(containerData.extensions)
+      );
       dispatch.rules.setRules(fromJS(containerData.rules));
       dispatch.dataElements.setDataElements(fromJS(containerData.dataElements));
       dispatch.registry.setRegistry(fromJS(registryData));

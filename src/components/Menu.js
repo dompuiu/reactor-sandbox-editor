@@ -12,12 +12,12 @@ const Menu = ({ initialize, match }) => (
       <ul className="pure-menu-list">
         <li className="pure-menu-item">
           <Link
-            to="/rules"
+            to="/extension_configurations"
             className={`pure-menu-link ${
-              match.path === '/rules' ? 'menu-selected' : ''
+              match.path === '/extension_configurations' ? 'menu-selected' : ''
             }`}
           >
-            Rules
+            Extension Configurations
           </Link>
         </li>
 
@@ -29,6 +29,16 @@ const Menu = ({ initialize, match }) => (
             }`}
           >
             Data Elements
+          </Link>
+        </li>
+        <li className="pure-menu-item">
+          <Link
+            to="/rules"
+            className={`pure-menu-link ${
+              match.path === '/rules' ? 'menu-selected' : ''
+            }`}
+          >
+            Rules
           </Link>
         </li>
       </ul>
