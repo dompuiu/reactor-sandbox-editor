@@ -5,8 +5,8 @@ import { dispatch } from '@rematch/core';
 export default {
   state: null, // initial state
   reducers: {
-    initCompleted() {
-      return true;
+    setInitialize(state, payload) {
+      return payload;
     }
   },
   effects: {
@@ -24,16 +24,29 @@ export default {
         )
       ]);
 
-      const containerData = await responses[0].json();
-      const registryData = await responses[1].json();
+      const containerDataResponse = await responses[0];
+      if (containerDataResponse.ok) {
+        const containerData = containerDataResponse.json();
+        dispatch.extensionConfigurations.setExtensionConfigurations(
+          fromJS(containerData.extensions)
+        );
+        dispatch.rules.setRules(fromJS(containerData.rules));
+        dispatch.dataElements.setDataElements(
+          fromJS(containerData.dataElements)
+        );
+      } else {
+        dispatch.extensionConfigurations.setExtensionConfigurations(fromJS([]));
+        dispatch.rules.setRules(fromJS([]));
+        dispatch.dataElements.setDataElements(fromJS([]));
+      }
 
-      dispatch.extensionConfigurations.setExtensionConfigurations(
-        fromJS(containerData.extensions)
-      );
-      dispatch.rules.setRules(fromJS(containerData.rules));
-      dispatch.dataElements.setDataElements(fromJS(containerData.dataElements));
-      dispatch.registry.setRegistry(fromJS(registryData));
-      dispatch.initialize.initCompleted();
+      const registryDataResponse = await responses[1];
+      if (registryDataResponse.ok) {
+        const registryData = registryDataResponse.json();
+
+        dispatch.registry.setRegistry(fromJS(registryData));
+        dispatch.initialize.setInitialize(true);
+      }
     }
   }
 };
