@@ -8,6 +8,7 @@ import Main from './components/Main';
 import RulesList from './components/RulesList';
 import RuleEdit from './components/RuleEdit';
 import DataElementsList from './components/DataElementsList';
+import DataElementEdit from './components/DataElementEdit';
 import ComponentEdit from './components/ComponentEdit';
 
 import registry from './models/registry';
@@ -40,6 +41,11 @@ class App extends Component {
             <Route exact path="/rules" component={RulesList} />
             <Route exact path="/rules/:rule_id" component={RuleEdit} />
             <Route exact path="/data_elements" component={DataElementsList} />
+            <Route
+              exact
+              path="/data_elements/:data_element_id"
+              component={DataElementEdit}
+            />
             <Route
               exact
               path="/rules/:rule_id/:type(events|conditions|actions)/:component_id"

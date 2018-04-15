@@ -3,44 +3,21 @@ import { Link, withRouter } from 'react-router-dom';
 import { connect } from 'react-redux';
 import { Map, List } from 'immutable';
 import './ComponentEdit.css';
-import once from './helpers/once';
 import ComponentIframe from './ComponentIframe';
 
 const isNewComponent = props => {
-  const componentId = props.match.params.component_id;
-  const type = props.match.params.type;
+  const dataElementId = props.match.params.data_element_id;
 
   return (
-    componentId === 'new' ||
-    !props.currentRule ||
-    componentId >= (props.currentRule.get(type) || List()).size
+    dataElementId === 'new' ||
+    dataElementId >= (props.dataElements || List()).size
   );
 };
 
-const setCurrentRuleOnce = once(props => {
-  props.setCurrentRule(currentRule(props));
-});
-
-const currentRule = props => {
-  const ruleId = props.match.params.rule_id;
-  let rule;
-
-  if (props.currentRule && props.currentRule.get('rule_id') === ruleId) {
-    rule = props.currentRule;
-  } else {
-    rule = (props.rules || List()).get(ruleId) || Map();
-  }
-  rule = rule.set('rule_id', ruleId);
-  return rule;
-};
-
-const getComponent = props => {
-  const type = props.match.params.type;
-  const componentId = props.match.params.component_id;
-
-  const rule = currentRule(props);
+const getDataElement = props => {
+  const dataElementId = props.match.params.data_element_id;
   return (
-    rule.getIn([type, componentId]) ||
+    (props.dataElements || List()).get(dataElementId) ||
     Map({
       modulePath: '',
       settings: null
@@ -48,7 +25,7 @@ const getComponent = props => {
   );
 };
 
-class ComponentEdit extends Component {
+class DataElementEdit extends Component {
   constructor(props) {
     super(props);
 
@@ -58,32 +35,27 @@ class ComponentEdit extends Component {
   }
 
   static getDerivedStateFromProps(nextProps, prevState) {
-    if (nextProps.initialize) {
-      setCurrentRuleOnce(nextProps);
-    }
-
-    return nextProps.initialize && prevState.component
+    return nextProps.initialize && prevState.dataElement
       ? prevState
       : {
-        component: getComponent(nextProps)
+        dataElement: getDataElement(nextProps)
       };
   }
 
   handleComponentTypeChange(event) {
     this.setState({
-      component: this.state.component.merge({
+      dataElement: this.state.dataElement.merge({
         settings: null,
         modulePath: event.target.value
       })
     });
   }
 
-  componentList() {
-    const type = this.props.match.params.type;
+  dataElementsList() {
     const componentList = {};
     const groupList = [];
 
-    (this.props.registry.getIn(['components', type]) || List())
+    (this.props.registry.getIn(['components', 'dataElements']) || List())
       .valueSeq()
       .forEach(v => {
         if (!componentList[v.get('extensionDisplayName')]) {
@@ -113,20 +85,30 @@ class ComponentEdit extends Component {
     return groupList;
   }
 
+  backLink() {
+    return '/data_elements/';
+  }
+
+  handleNameChange(event) {
+    const dataElement = this.state.dataElement;
+    const newDataElement = dataElement.set('name', event.target.value);
+
+    this.setState({ dataElement: newDataElement });
+  }
+
   isValid() {
     const errors = {};
 
-    if (!this.state.component.get('modulePath')) {
+    if (!this.state.dataElement.get('name')) {
+      errors.name = true;
+    }
+
+    if (!this.state.dataElement.get('modulePath')) {
       errors.modulePath = true;
     }
 
     this.setState({ errors: errors });
     return Object.keys(errors).length === 0;
-  }
-
-  backLink() {
-    const ruleId = this.props.match.params.rule_id;
-    return `/rules/${ruleId}`;
   }
 
   handleSave(event) {
@@ -135,19 +117,17 @@ class ComponentEdit extends Component {
     }
 
     const params = this.props.match.params;
-
     const method = isNewComponent(this.props)
-      ? 'addComponent'
-      : 'saveComponent';
+      ? 'addDataElement'
+      : 'saveDataElement';
 
     this.props.currentIframe.promise
       .then(api => Promise.all([api.validate(), api.getSettings()]))
       .then(([isValid, settings]) => {
         if (isValid) {
           this.props[method]({
-            id: params.component_id,
-            type: params.type,
-            component: this.state.component.merge({ settings: settings })
+            id: params.data_element_id,
+            dataElement: this.state.dataElement.merge({ settings: settings })
           });
 
           this.props.history.push(this.backLink());
@@ -161,8 +141,8 @@ class ComponentEdit extends Component {
     const componentIframeDetails = props.initialize
       ? props.registry.getIn([
         'components',
-        props.match.params.type,
-        this.state.component.get('modulePath')
+        'dataElements',
+        this.state.dataElement.get('modulePath')
       ])
       : Map();
 
@@ -174,19 +154,28 @@ class ComponentEdit extends Component {
               <div className="component-edit-sidebar">
                 <form className="pure-form pure-form-stacked">
                   <fieldset>
-                    <h4>Component Details</h4>
-                    <label htmlFor="componentType">Type</label>
+                    <h4>Data Element Details</h4>
+                    <label htmlFor="dataElementType">Type</label>
                     <select
-                      id="componentType"
+                      id="dataElementType"
                       className={
                         this.state.errors.modulePath ? 'border-error' : ''
                       }
-                      value={this.state.component.get('modulePath')}
+                      value={this.state.dataElement.get('modulePath')}
                       onChange={this.handleComponentTypeChange.bind(this)}
                     >
                       <option value="">Please select...</option>
-                      {this.componentList()}
+                      {this.dataElementsList()}
                     </select>
+                    <br />
+                    <label htmlFor="dataElementName">Name</label>
+                    <input
+                      className={this.state.errors.name ? 'border-error' : ''}
+                      id="dataElementName"
+                      type="text"
+                      value={this.state.dataElement.get('name') || ''}
+                      onChange={this.handleNameChange.bind(this)}
+                    />
                   </fieldset>
                 </form>
 
@@ -207,7 +196,7 @@ class ComponentEdit extends Component {
             <div className="pure-u-3-4">
               <ComponentIframe
                 component={componentIframeDetails}
-                settings={this.state.component.get('settings')}
+                settings={this.state.dataElement.get('settings')}
                 server={props.registry.getIn(['environment', 'server'])}
               />
             </div>
@@ -222,8 +211,7 @@ class ComponentEdit extends Component {
 
 const mapState = state => {
   return {
-    rules: state.rules,
-    currentRule: state.currentRule,
+    dataElements: state.dataElements,
     currentIframe: state.currentIframe,
     registry: state.registry,
     initialize: state.initialize
@@ -231,13 +219,10 @@ const mapState = state => {
 };
 
 const mapDispatch = ({
-  rules: { saveRule },
-  currentRule: { setCurrentRule, saveComponent, addComponent }
+  dataElements: { saveDataElement, addDataElement }
 }) => ({
-  saveRule: payload => saveRule(payload),
-  setCurrentRule: payload => setCurrentRule(payload),
-  saveComponent: payload => saveComponent(payload),
-  addComponent: payload => addComponent(payload)
+  saveDataElement: payload => saveDataElement(payload),
+  addDataElement: payload => addDataElement(payload)
 });
 
-export default withRouter(connect(mapState, mapDispatch)(ComponentEdit));
+export default withRouter(connect(mapState, mapDispatch)(DataElementEdit));

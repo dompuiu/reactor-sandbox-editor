@@ -8,10 +8,10 @@ export default {
         .toList();
     },
     addDataElement(state, payload) {
-      return state.push(payload.data_element);
+      return state.push(payload.dataElement);
     },
     saveDataElement(state, payload) {
-      return state.update(payload.id, item => payload.data_element);
+      return state.update(payload.id, item => payload.dataElement);
     },
     deleteDataElement(state, payload) {
       return state.delete(payload);

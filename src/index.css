@@ -60,3 +60,7 @@ body,
 .button-xlarge {
   font-size: 125%;
 }
+
+.border-error {
+  border: 1px solid red !important;
+}
