@@ -2,22 +2,3 @@
   width: 80%;
   margin: 1rem auto;
 }
-
-.rule-list-table {
-  margin: auto;
-  width: 100%;
-}
-
-.rule-name {
-  text-align: left;
-}
-
-.rule-actions {
-  text-align: center;
-  white-space: nowrap;
-  width: 10%;
-}
-
-.create-new-rule-button {
-  margin-top: 1rem;
-}
