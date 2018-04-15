@@ -4,7 +4,8 @@ export default {
     setDataElements(state, payload) {
       return payload
         .entrySeq()
-        .map(([key, value]) => value.merge({ name: key }));
+        .map(([key, value]) => value.merge({ name: key }))
+        .toList();
     },
     addDataElement(state, payload) {
       return state.push(payload.data_element);
