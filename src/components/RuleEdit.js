@@ -27,7 +27,24 @@ class RuleEdit extends Component {
   constructor(props) {
     super(props);
 
-    this.state = {};
+    this.state = {
+      errors: {
+        isValid() {
+          const errors = {};
+
+          if (!this.state.dataElement.get('name')) {
+            errors.name = true;
+          }
+
+          if (!this.state.dataElement.get('modulePath')) {
+            errors.modulePath = true;
+          }
+
+          this.setState({ errors: errors });
+          return Object.keys(errors).length === 0;
+        }
+      }
+    };
   }
 
   static getDerivedStateFromProps(nextProps, prevState) {
@@ -43,7 +60,22 @@ class RuleEdit extends Component {
     };
   }
 
+  isValid() {
+    const errors = {};
+
+    if (!this.state.rule.get('name')) {
+      errors.name = true;
+    }
+
+    this.setState({ errors: errors });
+    return Object.keys(errors).length === 0;
+  }
+
   handleSave(event) {
+    if (!this.isValid()) {
+      return false;
+    }
+
     const ruleId = this.props.match.params.rule_id;
     const method = this.state.newRule ? 'addRule' : 'saveRule';
 
@@ -90,6 +122,7 @@ class RuleEdit extends Component {
                   </legend>
                   <input
                     type="text"
+                    className={this.state.errors.name ? 'border-error' : ''}
                     placeholder="Rule name"
                     value={this.state.rule.get('name') || ''}
                     onChange={this.handleNameChange.bind(this)}
