@@ -9,7 +9,7 @@ import RulesList from './components/RulesList';
 import RuleEdit from './components/RuleEdit';
 import DataElementsList from './components/DataElementsList';
 import DataElementEdit from './components/DataElementEdit';
-import ComponentEdit from './components/ComponentEdit';
+import RuleComponentEdit from './components/RuleComponentEdit';
 
 import registry from './models/registry';
 import currentIframe from './models/currentIframe';
@@ -49,7 +49,7 @@ class App extends Component {
             <Route
               exact
               path="/rules/:rule_id/:type(events|conditions|actions)/:component_id"
-              component={ComponentEdit}
+              component={RuleComponentEdit}
             />
           </Switch>
         </Router>

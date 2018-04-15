@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { Link, withRouter } from 'react-router-dom';
-import './ComponentCard.css';
+import './RuleComponentCard.css';
 
 const cardDetails = (item, type, registry) => {
   const component = registry.getIn([
@@ -24,7 +24,7 @@ const cardDetails = (item, type, registry) => {
   );
 };
 
-const ComponentCard = ({
+const RuleComponentCard = ({
   item,
   match,
   type,
@@ -32,7 +32,7 @@ const ComponentCard = ({
   registry,
   handleDeleteClick
 }) => (
-  <div className="card" title={item.get('modulePath')}>
+  <div className="rule-component-card" title={item.get('modulePath')}>
     {cardDetails(item, type, registry)}
     <Link to={`/rules/${match.params.rule_id}/${type}/${index}`}>
       <div title="Edit" className="icono-file" />
@@ -54,4 +54,4 @@ const mapState = state => {
 
 const mapDispatch = () => ({});
 
-export default withRouter(connect(mapState, mapDispatch)(ComponentCard));
+export default withRouter(connect(mapState, mapDispatch)(RuleComponentCard));

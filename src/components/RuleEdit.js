@@ -3,7 +3,7 @@ import './RuleEdit.css';
 import { Link, withRouter } from 'react-router-dom';
 import { connect } from 'react-redux';
 import { List, Map } from 'immutable';
-import ComponentList from './ComponentList';
+import RuleComponentsList from './RuleComponentsList';
 
 const isNewRule = props => {
   const ruleId = props.match.params.rule_id;
@@ -98,7 +98,7 @@ class RuleEdit extends Component {
               </form>
               <div className="component-group">
                 <strong>Events</strong>
-                <ComponentList
+                <RuleComponentsList
                   handleDeleteClick={this.handleDeleteClick.bind(this)}
                   items={this.state.rule.get('events') || List()}
                   type="events"
@@ -106,7 +106,7 @@ class RuleEdit extends Component {
               </div>
               <div className="component-group">
                 <strong>Conditions</strong>
-                <ComponentList
+                <RuleComponentsList
                   handleDeleteClick={this.handleDeleteClick.bind(this)}
                   items={this.state.rule.get('conditions') || List()}
                   type="conditions"
@@ -114,7 +114,7 @@ class RuleEdit extends Component {
               </div>
               <div className="component-group">
                 <strong>Actions</strong>
-                <ComponentList
+                <RuleComponentsList
                   handleDeleteClick={this.handleDeleteClick.bind(this)}
                   items={this.state.rule.get('actions') || List()}
                   type="actions"

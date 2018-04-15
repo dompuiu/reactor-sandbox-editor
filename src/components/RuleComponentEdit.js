@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { Link, withRouter } from 'react-router-dom';
 import { connect } from 'react-redux';
 import { Map, List } from 'immutable';
-import './ComponentEdit.css';
+import './RuleComponentEdit.css';
 import once from './helpers/once';
 import ComponentIframe from './ComponentIframe';
 
@@ -48,7 +48,7 @@ const getComponent = props => {
   );
 };
 
-class ComponentEdit extends Component {
+class RuleComponentEdit extends Component {
   constructor(props) {
     super(props);
 
@@ -240,4 +240,4 @@ const mapDispatch = ({
   addComponent: payload => addComponent(payload)
 });
 
-export default withRouter(connect(mapState, mapDispatch)(ComponentEdit));
+export default withRouter(connect(mapState, mapDispatch)(RuleComponentEdit));

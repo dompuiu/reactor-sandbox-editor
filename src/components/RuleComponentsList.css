@@ -2,7 +2,7 @@
   clear: both;
 }
 
-.component-list:after {
+.rule-components-list:after {
   content: '';
   display: table;
   clear: both;
