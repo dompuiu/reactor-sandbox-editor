@@ -8,7 +8,6 @@ import ComponentIframe from './ComponentIframe';
 
 const isNewComponent = props => {
   const componentId = props.match.params.component_id;
-  const ruleId = props.match.params.rule_id;
   const type = props.match.params.type;
 
   return (
