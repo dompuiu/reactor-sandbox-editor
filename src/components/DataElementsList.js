@@ -7,6 +7,7 @@ const DataElementsList = ({ dataElements, deleteDataElement }) =>
   dataElements ? (
     <List
       items={dataElements}
+      nameProperty="name"
       deleteFn={deleteDataElement}
       linkPrefix="/data_elements"
       className="data-elements-list"

@@ -11,7 +11,7 @@ export default {
       return state.push(payload.extensionConfiguration);
     },
     saveExtensionConfiguration(state, payload) {
-      return state.update(payload.id, item => payload.dataElement);
+      return state.update(payload.id, item => payload.extensionConfiguration);
     },
     deleteExtensionConfiguration(state, payload) {
       return state.delete(payload);

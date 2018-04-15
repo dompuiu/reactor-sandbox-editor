@@ -7,6 +7,7 @@ const RulesList = ({ rules, deleteRule }) =>
   rules ? (
     <List
       items={rules}
+      nameProperty="name"
       deleteFn={deleteRule}
       linkPrefix="/rules"
       className="rules-list"

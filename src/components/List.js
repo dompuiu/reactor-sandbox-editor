@@ -3,7 +3,14 @@ import Menu from './Menu';
 import { Link } from 'react-router-dom';
 import './List.css';
 
-const List = ({ items, deleteFn, className, addLink, linkPrefix }) => (
+const List = ({
+  items,
+  nameProperty,
+  deleteFn,
+  className,
+  addLink,
+  linkPrefix
+}) => (
   <div>
     <Menu />
     <div className={`list-container ${className}`}>
@@ -17,7 +24,7 @@ const List = ({ items, deleteFn, className, addLink, linkPrefix }) => (
         <tbody>
           {items.map((item, i) => (
             <tr key={`List${i}`}>
-              <td className="list-item-name">{item.get('name')}</td>
+              <td className="list-item-name">{item.get(nameProperty)}</td>
               <td className="list-item-actions">
                 <Link
                   to={`${linkPrefix}/${i}`}

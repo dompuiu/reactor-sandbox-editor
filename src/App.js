@@ -11,6 +11,7 @@ import RuleComponentEdit from './components/RuleComponentEdit';
 import DataElementsList from './components/DataElementsList';
 import DataElementEdit from './components/DataElementEdit';
 import ExtensionConfigurationsList from './components/ExtensionConfigurationsList';
+import ExtensionConfigurationEdit from './components/ExtensionConfigurationEdit';
 
 import registry from './models/registry';
 import currentIframe from './models/currentIframe';
@@ -58,6 +59,11 @@ class App extends Component {
               exact
               path="/extension_configurations"
               component={ExtensionConfigurationsList}
+            />
+            <Route
+              exact
+              path="/extension_configurations/:extension_configuration_id"
+              component={ExtensionConfigurationEdit}
             />
           </Switch>
         </Router>

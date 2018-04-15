@@ -10,6 +10,7 @@ const ExtensionConfigurationsList = ({
   extensionConfigurations ? (
     <List
       items={extensionConfigurations}
+      nameProperty="displayName"
       deleteFn={deleteExtensionConfiguration}
       linkPrefix="/extension_configurations"
       className="extension-configurations-list"
