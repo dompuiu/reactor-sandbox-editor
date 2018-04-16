@@ -151,6 +151,15 @@ class DataElementEdit extends Component {
             <form className="pure-form pure-form-stacked">
               <fieldset>
                 <h4>Data Element Details</h4>
+                <label htmlFor="dataElementName">Name</label>
+                <input
+                  className={this.state.errors.name ? 'border-error' : ''}
+                  id="dataElementName"
+                  type="text"
+                  value={this.state.dataElement.get('name') || ''}
+                  onChange={this.handleNameChange.bind(this)}
+                />
+                <br />
                 <label htmlFor="dataElementType">Type</label>
                 <select
                   id="dataElementType"
@@ -161,15 +170,6 @@ class DataElementEdit extends Component {
                   <option value="">Please select...</option>
                   {this.dataElementsList()}
                 </select>
-                <br />
-                <label htmlFor="dataElementName">Name</label>
-                <input
-                  className={this.state.errors.name ? 'border-error' : ''}
-                  id="dataElementName"
-                  type="text"
-                  value={this.state.dataElement.get('name') || ''}
-                  onChange={this.handleNameChange.bind(this)}
-                />
               </fieldset>
             </form>
 
