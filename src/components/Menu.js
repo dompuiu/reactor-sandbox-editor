@@ -43,6 +43,16 @@ const Menu = ({ match }) => (
         </li>
         <li className="pure-menu-item">
           <Link
+            to="/property_settings"
+            className={`pure-menu-link ${
+              match.path === '/property_settings' ? 'menu-selected' : ''
+            }`}
+          >
+            Property Settings
+          </Link>
+        </li>
+        <li className="pure-menu-item">
+          <Link
             to="/settings"
             className={`pure-menu-link ${
               match.path === '/settings' ? 'menu-selected' : ''

@@ -1,0 +1,8 @@
+.property-settings-container {
+  width: 25 rem;
+  margin: 2rem auto;
+}
+
+.property-settings-container .pure-form-aligned .pure-control-group {
+  margin-right: 4rem;
+}

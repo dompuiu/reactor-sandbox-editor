@@ -1,7 +1,7 @@
 import React from 'react';
 import './Main.css';
 
-const Main = ({ brain, loadContainerData, clearContainerData }) => (
+const Main = () => (
   <div>
     <div className="main-container">
       <div className="big-text">Welcome to the sandbox editor! </div>

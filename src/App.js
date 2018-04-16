@@ -7,6 +7,7 @@ import { dispatch } from '@rematch/core';
 import PreloaderRoute from './components/PreloaderRoute';
 import Main from './components/Main';
 import Settings from './components/Settings';
+import PropertySettings from './components/PropertySettings';
 import RulesList from './components/RulesList';
 import RuleEdit from './components/RuleEdit';
 import RuleComponentEdit from './components/RuleComponentEdit';
@@ -20,6 +21,7 @@ import currentIframe from './models/currentIframe';
 import currentRule from './models/currentRule';
 import rules from './models/rules';
 import dataElements from './models/dataElements';
+import propertySettings from './models/propertySettings';
 import extensionConfigurations from './models/extensionConfigurations';
 import brain from './models/brain';
 
@@ -31,7 +33,8 @@ const store = init({
     extensionConfigurations: extensionConfigurations,
     registry: registry,
     currentIframe: currentIframe,
-    currentRule: currentRule
+    currentRule: currentRule,
+    propertySettings: propertySettings
   }
 });
 
@@ -45,6 +48,11 @@ class App extends Component {
           <Switch>
             <PreloaderRoute exact path="/" component={Main} />
             <PreloaderRoute exact path="/settings" component={Settings} />
+            <PreloaderRoute
+              exact
+              path="/property_settings"
+              component={PropertySettings}
+            />
             <PreloaderRoute exact path="/rules" component={RulesList} />
             <PreloaderRoute exact path="/rules/:rule_id" component={RuleEdit} />
             <PreloaderRoute

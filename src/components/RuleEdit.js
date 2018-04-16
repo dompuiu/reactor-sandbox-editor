@@ -28,31 +28,12 @@ class RuleEdit extends Component {
     super(props);
 
     this.state = {
-      errors: {
-        isValid() {
-          const errors = {};
-
-          if (!this.state.dataElement.get('name')) {
-            errors.name = true;
-          }
-
-          if (!this.state.dataElement.get('modulePath')) {
-            errors.modulePath = true;
-          }
-
-          this.setState({ errors: errors });
-          return Object.keys(errors).length === 0;
-        }
-      }
+      errors: {}
     };
   }
 
   static getDerivedStateFromProps(nextProps, prevState) {
     const rule = currentRule(nextProps);
-
-    if (nextProps.initialize) {
-      nextProps.setCurrentRule(rule);
-    }
 
     return {
       rule: rule,

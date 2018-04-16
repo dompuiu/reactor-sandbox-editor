@@ -53,7 +53,8 @@ export default {
       this.pushDataDown({
         extensions: [],
         rules: [],
-        dataElements: []
+        dataElements: [],
+        property: { settings: {} }
       });
 
       this.setContainerDataReseted('success');
@@ -65,6 +66,9 @@ export default {
       );
       dispatch.rules.setRules(fromJS(payload.rules));
       dispatch.dataElements.setDataElements(fromJS(payload.dataElements));
+      dispatch.propertySettings.setPropertySettings(
+        fromJS((payload.property && payload.property.settings) || {})
+      );
     }
   }
 };
