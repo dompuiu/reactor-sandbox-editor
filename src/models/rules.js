@@ -1,19 +1,27 @@
 import { List } from 'immutable';
+import localStorage from '../models/localStorage';
 
 export default {
   state: List(), // initial state
   reducers: {
     setRules(state, payload) {
+      localStorage.update('rules', payload);
       return payload;
     },
     addRule(state, payload) {
-      return state.push(payload.rule);
+      const rules = state.push(payload.rule);
+      localStorage.update('rules', rules);
+      return rules;
     },
     saveRule(state, payload) {
-      return state.update(payload.id, item => payload.rule);
+      const rules = state.update(payload.id, item => payload.rule);
+      localStorage.update('rules', rules);
+      return rules;
     },
     deleteRule(state, payload) {
-      return state.delete(payload);
+      const rules = state.delete(payload);
+      localStorage.update('rules', rules);
+      return rules;
     }
   }
 };

@@ -1,16 +1,23 @@
 import { fromJS, Map } from 'immutable';
 import environment from './environment';
+import localStorage from './localStorage';
 import { dispatch } from '@rematch/core';
 
 export default {
   state: Map(), // initial state
   reducers: {
+    setContainerDataLoaded(state, payload) {
+      return state.set('containerDataLoaded', payload);
+    },
+    setContainerDataReseted(state, payload) {
+      return state.set('containerDataReseted', payload);
+    },
     setInitialized(state, payload) {
       return state.set('initialized', payload);
     }
   },
   effects: {
-    async loadRegistryData(payload, rootState) {
+    async initialize(payload, rootState) {
       const response = await fetch(
         `${environment.server.host}:${
           environment.server.port
@@ -21,7 +28,8 @@ export default {
         const data = await response.json();
 
         dispatch.registry.setRegistry(fromJS(data));
-        dispatch.brain.setInitialized(true);
+        this.pushDataDown(localStorage.get());
+        this.setInitialized(true);
       }
     },
 
@@ -34,18 +42,29 @@ export default {
 
       if (response.ok) {
         const containerData = await response.json();
-        dispatch.extensionConfigurations.setExtensionConfigurations(
-          fromJS(containerData.extensions)
-        );
-        dispatch.rules.setRules(fromJS(containerData.rules));
-        dispatch.dataElements.setDataElements(
-          fromJS(containerData.dataElements)
-        );
+        this.pushDataDown(containerData);
+        this.setContainerDataLoaded('success');
       } else {
-        dispatch.extensionConfigurations.setExtensionConfigurations(fromJS([]));
-        dispatch.rules.setRules(fromJS([]));
-        dispatch.dataElements.setDataElements(fromJS([]));
+        this.setContainerDataLoaded('failed');
       }
+    },
+
+    clearContainerData(payload, rootState) {
+      this.pushDataDown({
+        extensions: [],
+        rules: [],
+        dataElements: []
+      });
+
+      this.setContainerDataReseted('success');
+    },
+
+    pushDataDown(payload, rootState) {
+      dispatch.extensionConfigurations.setExtensionConfigurations(
+        fromJS(payload.extensions)
+      );
+      dispatch.rules.setRules(fromJS(payload.rules));
+      dispatch.dataElements.setDataElements(fromJS(payload.dataElements));
     }
   }
 };

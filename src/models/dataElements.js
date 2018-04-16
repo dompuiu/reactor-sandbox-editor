@@ -1,22 +1,35 @@
 import { List } from 'immutable';
+import localStorage from '../models/localStorage';
 
 export default {
   state: List(), // initial state
   reducers: {
     setDataElements(state, payload) {
-      return payload
+      const dataElements = payload
         .entrySeq()
         .map(([key, value]) => value.merge({ name: key }))
         .toList();
+
+      localStorage.update('dataElements', dataElements);
+      return dataElements;
     },
     addDataElement(state, payload) {
-      return state.push(payload.dataElement);
+      const dataElements = state.push(payload.dataElement);
+      localStorage.update('dataElements', dataElements);
+      return dataElements;
     },
     saveDataElement(state, payload) {
-      return state.update(payload.id, item => payload.dataElement);
+      const dataElements = state.update(
+        payload.id,
+        item => payload.dataElement
+      );
+      localStorage.update('dataElements', dataElements);
+      return dataElements;
     },
     deleteDataElement(state, payload) {
-      return state.delete(payload);
+      const dataElements = state.delete(payload);
+      localStorage.update('dataElements', dataElements);
+      return dataElements;
     }
   }
 };

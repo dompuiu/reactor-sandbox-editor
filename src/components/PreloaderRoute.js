@@ -8,7 +8,7 @@ const PreloaderRoute = ({ component: Component, brain, ...rest }) => (
     {...rest}
     render={props =>
       brain.get('initialized') ? (
-        <div className="main-container">
+        <div className="view-container">
           <Menu />
           <Component {...props} />
         </div>

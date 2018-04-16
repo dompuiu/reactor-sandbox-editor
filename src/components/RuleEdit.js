@@ -152,7 +152,7 @@ class RuleEdit extends Component {
           <div className="button-container">
             <button
               onClick={this.handleSave.bind(this)}
-              className="button-success pure-button"
+              className="pure-button-primary pure-button"
             >
               Save
             </button>

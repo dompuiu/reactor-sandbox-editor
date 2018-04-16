@@ -34,7 +34,7 @@ const store = init({
   }
 });
 
-dispatch({ type: 'brain/loadRegistryData' });
+dispatch({ type: 'brain/initialize' });
 
 class App extends Component {
   render() {

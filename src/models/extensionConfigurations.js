@@ -1,22 +1,37 @@
 import { List } from 'immutable';
+import localStorage from '../models/localStorage';
 
 export default {
   state: List(), // initial state
   reducers: {
     setExtensionConfigurations(state, payload) {
-      return payload
+      const extensionConfigurations = payload
         .entrySeq()
         .map(([key, value]) => value.merge({ name: key }))
         .toList();
+
+      localStorage.update('extensions', extensionConfigurations);
+      return extensionConfigurations;
     },
     addExtensionConfiguration(state, payload) {
-      return state.push(payload.extensionConfiguration);
+      const extensionConfigurations = state.push(
+        payload.extensionConfiguration
+      );
+      localStorage.update('extensions', extensionConfigurations);
+      return extensionConfigurations;
     },
     saveExtensionConfiguration(state, payload) {
-      return state.update(payload.id, item => payload.extensionConfiguration);
+      const extensionConfigurations = state.update(
+        payload.id,
+        item => payload.extensionConfiguration
+      );
+      localStorage.update('extensions', extensionConfigurations);
+      return extensionConfigurations;
     },
     deleteExtensionConfiguration(state, payload) {
-      return state.delete(payload);
+      const extensionConfigurations = state.delete(payload);
+      localStorage.update('extensions', extensionConfigurations);
+      return extensionConfigurations;
     }
   }
 };

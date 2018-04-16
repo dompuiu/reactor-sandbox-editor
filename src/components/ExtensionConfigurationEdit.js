@@ -145,7 +145,7 @@ class ExtensionConfigurationEdit extends Component {
 
             <div className="button-container">
               <button
-                className="button-success pure-button"
+                className="pure-button-primary pure-button"
                 onClick={this.handleSave.bind(this)}
               >
                 Save
