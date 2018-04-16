@@ -6,6 +6,7 @@ import { dispatch } from '@rematch/core';
 
 import PreloaderRoute from './components/PreloaderRoute';
 import Main from './components/Main';
+import Settings from './components/Settings';
 import RulesList from './components/RulesList';
 import RuleEdit from './components/RuleEdit';
 import RuleComponentEdit from './components/RuleComponentEdit';
@@ -43,6 +44,7 @@ class App extends Component {
         <Router>
           <Switch>
             <PreloaderRoute exact path="/" component={Main} />
+            <PreloaderRoute exact path="/settings" component={Settings} />
             <PreloaderRoute exact path="/rules" component={RulesList} />
             <PreloaderRoute exact path="/rules/:rule_id" component={RuleEdit} />
             <PreloaderRoute
