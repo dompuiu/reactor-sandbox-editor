@@ -8,6 +8,7 @@
   padding: 0 2rem;
 }
 
+.component-edit-sidebar input,
 .component-edit-sidebar select {
   width: 100%;
 }

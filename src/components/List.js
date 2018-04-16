@@ -25,15 +25,12 @@ const List = ({
             <td className="list-item-actions">
               <Link
                 to={`${linkPrefix}/${i}`}
-                className="button-success pure-button"
+                className="pure-button-primary pure-button"
               >
                 Edit
               </Link>
               &nbsp;
-              <button
-                onClick={deleteFn.bind(this, i)}
-                className="button-error pure-button"
-              >
+              <button onClick={deleteFn.bind(this, i)} className="pure-button">
                 Delete
               </button>
             </td>
