@@ -3,8 +3,8 @@ import { connect } from 'react-redux';
 import { Link, withRouter } from 'react-router-dom';
 import './Menu.css';
 
-const Menu = ({ initialize, match }) => (
-  <div className={initialize ? 'main-menu' : 'hide'}>
+const Menu = ({ match }) => (
+  <div className="main-menu">
     <div className="pure-menu pure-menu-horizontal">
       <Link className="pure-menu-heading pure-menu-link" to="/">
         Editor
@@ -46,10 +46,7 @@ const Menu = ({ initialize, match }) => (
   </div>
 );
 
-const mapState = state => ({
-  initialize: state.initialize
-});
-
+const mapState = state => ({});
 const mapDispatch = () => ({});
 
 export default withRouter(connect(mapState, mapDispatch)(Menu));

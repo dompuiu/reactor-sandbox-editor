@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { Link, withRouter } from 'react-router-dom';
 import { connect } from 'react-redux';
 import { Map, List } from 'immutable';
-import './RuleComponentEdit.css';
+import './ComponentEditSidebar.css';
 import ComponentIframe from './ComponentIframe';
 
 const isNewComponent = props => {
@@ -35,7 +35,7 @@ class DataElementEdit extends Component {
   }
 
   static getDerivedStateFromProps(nextProps, prevState) {
-    return nextProps.initialize && prevState.dataElement
+    return prevState.dataElement
       ? prevState
       : {
         dataElement: getDataElement(nextProps)
@@ -138,72 +138,62 @@ class DataElementEdit extends Component {
   render() {
     const props = this.props;
 
-    const componentIframeDetails = props.initialize
-      ? props.registry.getIn([
-        'components',
-        'dataElements',
-        this.state.dataElement.get('modulePath')
-      ])
-      : Map();
+    const componentIframeDetails = props.registry.getIn([
+      'components',
+      'dataElements',
+      this.state.dataElement.get('modulePath')
+    ]);
 
     return (
-      <div style={{ height: '100%' }}>
-        {props.initialize ? (
-          <div className="pure-g component-edit-container">
-            <div className="pure-u-1-4">
-              <div className="component-edit-sidebar">
-                <form className="pure-form pure-form-stacked">
-                  <fieldset>
-                    <h4>Data Element Details</h4>
-                    <label htmlFor="dataElementType">Type</label>
-                    <select
-                      id="dataElementType"
-                      className={
-                        this.state.errors.modulePath ? 'border-error' : ''
-                      }
-                      value={this.state.dataElement.get('modulePath')}
-                      onChange={this.handleComponentTypeChange.bind(this)}
-                    >
-                      <option value="">Please select...</option>
-                      {this.dataElementsList()}
-                    </select>
-                    <br />
-                    <label htmlFor="dataElementName">Name</label>
-                    <input
-                      className={this.state.errors.name ? 'border-error' : ''}
-                      id="dataElementName"
-                      type="text"
-                      value={this.state.dataElement.get('name') || ''}
-                      onChange={this.handleNameChange.bind(this)}
-                    />
-                  </fieldset>
-                </form>
+      <div className="pure-g component-edit-container">
+        <div className="pure-u-1-4">
+          <div className="component-edit-sidebar">
+            <form className="pure-form pure-form-stacked">
+              <fieldset>
+                <h4>Data Element Details</h4>
+                <label htmlFor="dataElementType">Type</label>
+                <select
+                  id="dataElementType"
+                  className={this.state.errors.modulePath ? 'border-error' : ''}
+                  value={this.state.dataElement.get('modulePath')}
+                  onChange={this.handleComponentTypeChange.bind(this)}
+                >
+                  <option value="">Please select...</option>
+                  {this.dataElementsList()}
+                </select>
+                <br />
+                <label htmlFor="dataElementName">Name</label>
+                <input
+                  className={this.state.errors.name ? 'border-error' : ''}
+                  id="dataElementName"
+                  type="text"
+                  value={this.state.dataElement.get('name') || ''}
+                  onChange={this.handleNameChange.bind(this)}
+                />
+              </fieldset>
+            </form>
 
-                <div className="button-container">
-                  <button
-                    className="button-success pure-button"
-                    onClick={this.handleSave.bind(this)}
-                  >
-                    Save
-                  </button>
-                  &nbsp;
-                  <Link to={this.backLink()} className="pure-button">
-                    Cancel
-                  </Link>
-                </div>
-              </div>
-            </div>
-            <div className="pure-u-3-4">
-              <ComponentIframe
-                component={componentIframeDetails}
-                settings={this.state.dataElement.get('settings')}
-                server={props.registry.getIn(['environment', 'server'])}
-              />
+            <div className="button-container">
+              <button
+                className="button-success pure-button"
+                onClick={this.handleSave.bind(this)}
+              >
+                Save
+              </button>
+              &nbsp;
+              <Link to={this.backLink()} className="pure-button">
+                Cancel
+              </Link>
             </div>
           </div>
-        ) : (
-          <div className="big-text">Fetching data...</div>
-        )}
+        </div>
+        <div className="pure-u-3-4">
+          <ComponentIframe
+            component={componentIframeDetails}
+            settings={this.state.dataElement.get('settings')}
+            server={props.registry.getIn(['environment', 'server'])}
+          />
+        </div>
       </div>
     );
   }
@@ -213,8 +203,7 @@ const mapState = state => {
   return {
     dataElements: state.dataElements,
     currentIframe: state.currentIframe,
-    registry: state.registry,
-    initialize: state.initialize
+    registry: state.registry
   };
 };
 

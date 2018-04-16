@@ -1,9 +1,10 @@
 import React, { Component } from 'react';
 import { init } from '@rematch/core';
 import { Provider } from 'react-redux';
-import { HashRouter as Router, Route, Switch } from 'react-router-dom';
+import { HashRouter as Router, Switch } from 'react-router-dom';
 import { dispatch } from '@rematch/core';
 
+import PreloaderRoute from './components/PreloaderRoute';
 import Main from './components/Main';
 import RulesList from './components/RulesList';
 import RuleEdit from './components/RuleEdit';
@@ -19,11 +20,11 @@ import currentRule from './models/currentRule';
 import rules from './models/rules';
 import dataElements from './models/dataElements';
 import extensionConfigurations from './models/extensionConfigurations';
-import initialize from './models/initialize';
+import brain from './models/brain';
 
 const store = init({
   models: {
-    initialize: initialize,
+    brain: brain,
     rules: rules,
     dataElements: dataElements,
     extensionConfigurations: extensionConfigurations,
@@ -33,7 +34,7 @@ const store = init({
   }
 });
 
-dispatch({ type: 'initialize/loadData' });
+dispatch({ type: 'brain/loadRegistryData' });
 
 class App extends Component {
   render() {
@@ -41,26 +42,30 @@ class App extends Component {
       <Provider store={store}>
         <Router>
           <Switch>
-            <Route exact path="/" component={Main} />
-            <Route exact path="/rules" component={RulesList} />
-            <Route exact path="/rules/:rule_id" component={RuleEdit} />
-            <Route
+            <PreloaderRoute exact path="/" component={Main} />
+            <PreloaderRoute exact path="/rules" component={RulesList} />
+            <PreloaderRoute exact path="/rules/:rule_id" component={RuleEdit} />
+            <PreloaderRoute
               exact
               path="/rules/:rule_id/:type(events|conditions|actions)/:component_id"
               component={RuleComponentEdit}
             />
-            <Route exact path="/data_elements" component={DataElementsList} />
-            <Route
+            <PreloaderRoute
+              exact
+              path="/data_elements"
+              component={DataElementsList}
+            />
+            <PreloaderRoute
               exact
               path="/data_elements/:data_element_id"
               component={DataElementEdit}
             />
-            <Route
+            <PreloaderRoute
               exact
               path="/extension_configurations"
               component={ExtensionConfigurationsList}
             />
-            <Route
+            <PreloaderRoute
               exact
               path="/extension_configurations/:extension_configuration_id"
               component={ExtensionConfigurationEdit}

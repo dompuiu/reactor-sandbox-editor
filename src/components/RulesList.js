@@ -3,18 +3,15 @@ import List from './List';
 import { withRouter } from 'react-router-dom';
 import { connect } from 'react-redux';
 
-const RulesList = ({ rules, deleteRule }) =>
-  rules ? (
-    <List
-      items={rules}
-      nameProperty="name"
-      deleteFn={deleteRule}
-      linkPrefix="/rules"
-      className="rules-list"
-    />
-  ) : (
-    <div className="big-text">Fetching rules...</div>
-  );
+const RulesList = ({ rules, deleteRule }) => (
+  <List
+    items={rules}
+    nameProperty="name"
+    deleteFn={deleteRule}
+    linkPrefix="/rules"
+    className="rules-list"
+  />
+);
 
 const mapState = state => ({
   rules: state.rules

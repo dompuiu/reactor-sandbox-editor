@@ -3,7 +3,7 @@
 }
 
 .component-edit-sidebar {
-  background: #ededed;
+  border-right: 1px solid #cbcbcb;
   height: 100%;
   padding: 0 2rem;
 }

@@ -3,18 +3,15 @@ import List from './List';
 import { withRouter } from 'react-router-dom';
 import { connect } from 'react-redux';
 
-const DataElementsList = ({ dataElements, deleteDataElement }) =>
-  dataElements ? (
-    <List
-      items={dataElements}
-      nameProperty="name"
-      deleteFn={deleteDataElement}
-      linkPrefix="/data_elements"
-      className="data-elements-list"
-    />
-  ) : (
-    <div className="big-text">Fetching data elements...</div>
-  );
+const DataElementsList = ({ dataElements, deleteDataElement }) => (
+  <List
+    items={dataElements}
+    nameProperty="name"
+    deleteFn={deleteDataElement}
+    linkPrefix="/data_elements"
+    className="data-elements-list"
+  />
+);
 
 const mapState = state => ({
   dataElements: state.dataElements

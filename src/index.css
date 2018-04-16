@@ -64,3 +64,9 @@ body,
 .border-error {
   border: 1px solid red !important;
 }
+
+.main-container {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}

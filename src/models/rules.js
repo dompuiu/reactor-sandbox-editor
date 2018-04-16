@@ -1,5 +1,7 @@
+import { List } from 'immutable';
+
 export default {
-  state: null, // initial state
+  state: List(), // initial state
   reducers: {
     setRules(state, payload) {
       return payload;

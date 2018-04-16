@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { Link, withRouter } from 'react-router-dom';
 import { connect } from 'react-redux';
 import { Map, List } from 'immutable';
-import './RuleComponentEdit.css';
+import './ComponentEditSidebar.css';
 import ComponentIframe from './ComponentIframe';
 
 const isNewComponent = props => {
@@ -37,7 +37,7 @@ class ExtensionConfigurationEdit extends Component {
   }
 
   static getDerivedStateFromProps(nextProps, prevState) {
-    return nextProps.initialize && prevState.extensionConfiguration
+    return prevState.extensionConfiguration
       ? prevState
       : {
         extensionConfiguration: getExtensionConfiguration(nextProps)
@@ -118,60 +118,52 @@ class ExtensionConfigurationEdit extends Component {
   render() {
     const props = this.props;
 
-    const componentIframeDetails = props.initialize
-      ? props.registry.getIn([
-        'extensions',
-        this.state.extensionConfiguration.get('name')
-      ])
-      : Map();
+    const componentIframeDetails = props.registry.getIn([
+      'extensions',
+      this.state.extensionConfiguration.get('name')
+    ]);
 
     return (
-      <div style={{ height: '100%' }}>
-        {props.initialize ? (
-          <div className="pure-g component-edit-container">
-            <div className="pure-u-1-4">
-              <div className="component-edit-sidebar">
-                <form className="pure-form pure-form-stacked">
-                  <fieldset>
-                    <h4>Extension Configuration Name</h4>
-                    <label htmlFor="extensionConfigurationName">Name</label>
-                    <select
-                      id="extensionConfigurationName"
-                      className={this.state.errors.name ? 'border-error' : ''}
-                      value={this.state.extensionConfiguration.get('name')}
-                      onChange={this.handleNameChange.bind(this)}
-                    >
-                      <option value="">Please select...</option>
-                      {this.extensionConfigurationList()}
-                    </select>
-                  </fieldset>
-                </form>
+      <div className="pure-g component-edit-container">
+        <div className="pure-u-1-4">
+          <div className="component-edit-sidebar">
+            <form className="pure-form pure-form-stacked">
+              <fieldset>
+                <h4>Extension Configuration Name</h4>
+                <label htmlFor="extensionConfigurationName">Name</label>
+                <select
+                  id="extensionConfigurationName"
+                  className={this.state.errors.name ? 'border-error' : ''}
+                  value={this.state.extensionConfiguration.get('name')}
+                  onChange={this.handleNameChange.bind(this)}
+                >
+                  <option value="">Please select...</option>
+                  {this.extensionConfigurationList()}
+                </select>
+              </fieldset>
+            </form>
 
-                <div className="button-container">
-                  <button
-                    className="button-success pure-button"
-                    onClick={this.handleSave.bind(this)}
-                  >
-                    Save
-                  </button>
-                  &nbsp;
-                  <Link to={this.backLink()} className="pure-button">
-                    Cancel
-                  </Link>
-                </div>
-              </div>
-            </div>
-            <div className="pure-u-3-4">
-              <ComponentIframe
-                component={componentIframeDetails}
-                settings={this.state.extensionConfiguration.get('settings')}
-                server={props.registry.getIn(['environment', 'server'])}
-              />
+            <div className="button-container">
+              <button
+                className="button-success pure-button"
+                onClick={this.handleSave.bind(this)}
+              >
+                Save
+              </button>
+              &nbsp;
+              <Link to={this.backLink()} className="pure-button">
+                Cancel
+              </Link>
             </div>
           </div>
-        ) : (
-          <div className="big-text">Fetching data...</div>
-        )}
+        </div>
+        <div className="pure-u-3-4">
+          <ComponentIframe
+            component={componentIframeDetails}
+            settings={this.state.extensionConfiguration.get('settings')}
+            server={props.registry.getIn(['environment', 'server'])}
+          />
+        </div>
       </div>
     );
   }
@@ -181,8 +173,7 @@ const mapState = state => {
   return {
     extensionConfigurations: state.extensionConfigurations,
     currentIframe: state.currentIframe,
-    registry: state.registry,
-    initialize: state.initialize
+    registry: state.registry
   };
 };
 

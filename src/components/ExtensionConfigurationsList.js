@@ -6,18 +6,15 @@ import { connect } from 'react-redux';
 const ExtensionConfigurationsList = ({
   extensionConfigurations,
   deleteExtensionConfiguration
-}) =>
-  extensionConfigurations ? (
-    <List
-      items={extensionConfigurations}
-      nameProperty="displayName"
-      deleteFn={deleteExtensionConfiguration}
-      linkPrefix="/extension_configurations"
-      className="extension-configurations-list"
-    />
-  ) : (
-    <div className="big-text">Fetching extension configurations...</div>
-  );
+}) => (
+  <List
+    items={extensionConfigurations}
+    nameProperty="displayName"
+    deleteFn={deleteExtensionConfiguration}
+    linkPrefix="/extension_configurations"
+    className="extension-configurations-list"
+  />
+);
 
 const mapState = state => ({
   extensionConfigurations: state.extensionConfigurations
