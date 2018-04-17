@@ -3,6 +3,7 @@ import { connect } from 'react-redux';
 import { withRouter, Route } from 'react-router-dom';
 import Menu from './Menu';
 import ModalCodeEditor from './ModalCodeEditor';
+import ModalDataElementSelector from './ModalDataElementSelector';
 
 const PreloaderRoute = ({ component: Component, brain, ...rest }) => (
   <Route
@@ -11,6 +12,7 @@ const PreloaderRoute = ({ component: Component, brain, ...rest }) => (
       brain.get('initialized') ? (
         <div className="view-container">
           <ModalCodeEditor />
+          <ModalDataElementSelector />
           <Menu />
           <Component {...props} />
         </div>

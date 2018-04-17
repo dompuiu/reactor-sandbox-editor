@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
+import './Modal.css';
 
 class Modal extends Component {
   render() {
@@ -11,6 +12,7 @@ class Modal extends Component {
       <div className="backdrop">
         <div className="modal">
           <div className="header">
+            <div className="title">{this.props.title}</div>
             <div
               onClick={this.props.onClose}
               title="Delete"

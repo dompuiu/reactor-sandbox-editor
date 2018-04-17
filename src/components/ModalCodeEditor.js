@@ -47,10 +47,14 @@ class ModalCodeEditor extends Component {
 
   render() {
     const codeEditorModal = this.state.codeEditorModal;
+    if (!codeEditorModal) {
+      return null;
+    }
 
     return (
       <div className="modal-code-editor">
         <Modal
+          title="Code Editor"
           show={codeEditorModal.get('open')}
           onSave={this.handleOnSave.bind(this)}
           onClose={this.handleOnClose.bind(this)}

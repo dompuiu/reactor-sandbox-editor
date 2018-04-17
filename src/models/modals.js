@@ -15,8 +15,25 @@ export default {
         })
       );
     },
+
     closeCodeEditorModal(state, payload) {
       return state.delete('codeEditorModal');
+    },
+
+    openDataElementSelectorModal(state, payload) {
+      return state.merge(
+        fromJS({
+          dataElementSelectorModal: {
+            open: true,
+            onSave: payload.onSave,
+            onClose: payload.onClose
+          }
+        })
+      );
+    },
+
+    closeDataElementSelectorModal(state, payload) {
+      return state.delete('dataElementSelectorModal');
     }
   }
 };

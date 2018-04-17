@@ -36,6 +36,8 @@ class ComponentIframe extends Component {
   renderIframe() {
     const url = this.getUrl();
     const openCodeEditorModal = this.props.openCodeEditorModal;
+    const openDataElementSelectorModal = this.props
+      .openDataElementSelectorModal;
     if (!url) {
       return;
     }
@@ -55,11 +57,16 @@ class ComponentIframe extends Component {
             onClose: reject
           });
         });
-        // return Promise.resolve('sss');
       },
       openRegexTester(options = {}) {},
-      openDataElementSelector(options = {}) {},
-      openCssSelector() {},
+      openDataElementSelector(options = {}) {
+        return new Promise((resolve, reject) => {
+          openDataElementSelectorModal({
+            onSave: resolve,
+            onClose: reject
+          });
+        });
+      },
       markAsDirty() {}
     });
 
@@ -74,10 +81,11 @@ class ComponentIframe extends Component {
 const mapState = state => ({});
 const mapDispatch = ({
   currentIframe: { setCurrentIframe },
-  modals: { openCodeEditorModal }
+  modals: { openCodeEditorModal, openDataElementSelectorModal }
 }) => ({
   setCurrentIframe: payload => setCurrentIframe(payload),
-  openCodeEditorModal: payload => openCodeEditorModal(payload)
+  openCodeEditorModal: payload => openCodeEditorModal(payload),
+  openDataElementSelectorModal: payload => openDataElementSelectorModal(payload)
 });
 
 export default connect(mapState, mapDispatch)(ComponentIframe);
