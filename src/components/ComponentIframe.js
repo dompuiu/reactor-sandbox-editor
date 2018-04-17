@@ -35,6 +35,7 @@ class ComponentIframe extends Component {
 
   renderIframe() {
     const url = this.getUrl();
+    const openCodeEditorModal = this.props.openCodeEditorModal;
     if (!url) {
       return;
     }
@@ -46,7 +47,16 @@ class ComponentIframe extends Component {
         settings: this.props.settings && this.props.settings.toJS()
       },
       connectionTimeoutDuration: 30000,
-      openCodeEditor(options = {}) {},
+      openCodeEditor(options = {}) {
+        return new Promise((resolve, reject) => {
+          openCodeEditorModal({
+            code: options.code,
+            onSave: resolve,
+            onClose: reject
+          });
+        });
+        // return Promise.resolve('sss');
+      },
       openRegexTester(options = {}) {},
       openDataElementSelector(options = {}) {},
       openCssSelector() {},
@@ -62,8 +72,12 @@ class ComponentIframe extends Component {
 }
 
 const mapState = state => ({});
-const mapDispatch = ({ currentIframe: { setCurrentIframe } }) => ({
-  setCurrentIframe: payload => setCurrentIframe(payload)
+const mapDispatch = ({
+  currentIframe: { setCurrentIframe },
+  modals: { openCodeEditorModal }
+}) => ({
+  setCurrentIframe: payload => setCurrentIframe(payload),
+  openCodeEditorModal: payload => openCodeEditorModal(payload)
 });
 
 export default connect(mapState, mapDispatch)(ComponentIframe);

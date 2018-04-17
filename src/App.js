@@ -24,6 +24,7 @@ import dataElements from './models/dataElements';
 import propertySettings from './models/propertySettings';
 import extensionConfigurations from './models/extensionConfigurations';
 import brain from './models/brain';
+import modals from './models/modals';
 
 const store = init({
   models: {
@@ -34,7 +35,8 @@ const store = init({
     registry: registry,
     currentIframe: currentIframe,
     currentRule: currentRule,
-    propertySettings: propertySettings
+    propertySettings: propertySettings,
+    modals: modals
   }
 });
 
