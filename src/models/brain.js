@@ -18,6 +18,8 @@ export default {
   },
   effects: {
     async initialize(payload, rootState) {
+      this.pushDataDown(localStorage.get());
+
       const response = await fetch(
         `${environment.server.host}:${
           environment.server.port
@@ -28,7 +30,6 @@ export default {
         const data = await response.json();
 
         dispatch.registry.setRegistry(fromJS(data));
-        this.pushDataDown(localStorage.get());
         this.setInitialized(true);
       }
     },
