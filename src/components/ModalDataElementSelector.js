@@ -29,9 +29,13 @@ class ModalDataElementSelectorEditor extends Component {
   }
 
   handleOnSave() {
-    this.state.dataElementSelectorModal.get('onSave')(
-      '%' + this.state.dataElementSelectorModal.get('dataElement') + '%'
-    );
+    let newDataElement = '';
+    if (this.state.dataElementSelectorModal.get('dataElement')) {
+      newDataElement =
+        '%' + this.state.dataElementSelectorModal.get('dataElement') + '%';
+    }
+
+    this.state.dataElementSelectorModal.get('onSave')(newDataElement);
     this.props.closeDataElementSelectorModal();
   }
 
