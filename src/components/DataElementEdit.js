@@ -131,7 +131,10 @@ class DataElementEdit extends Component {
       errors.name = true;
     }
 
-    if (!this.state.dataElement.get('modulePath')) {
+    if (
+      !this.state.dataElement.get('modulePath') ||
+      !this.props.currentIframe.promise
+    ) {
       errors.modulePath = true;
     }
 
