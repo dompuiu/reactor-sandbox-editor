@@ -6,9 +6,14 @@
   border-right: 1px solid #cbcbcb;
   height: 100%;
   padding: 0 2rem;
+  overflow: auto;
 }
 
-.component-edit-sidebar input,
+.component-edit-sidebar input[type="text"],
 .component-edit-sidebar select {
   width: 100%;
+}
+
+.button-container {
+  padding-bottom: 1rem;
 }

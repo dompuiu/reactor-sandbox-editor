@@ -76,6 +76,41 @@ class RuleComponentEdit extends Component {
     });
   }
 
+  handleInputChange(fieldName, event) {
+    const component = this.state.component;
+    const target = event.target;
+    const value = target.type === 'checkbox' ? target.checked : target.value;
+    const newComponent = component.set(fieldName, value);
+
+    this.setState({ component: newComponent });
+  }
+
+  handleSave(event) {
+    if (!this.isValid()) {
+      return false;
+    }
+
+    const params = this.props.match.params;
+
+    const method = isNewComponent(this.props)
+      ? 'addComponent'
+      : 'saveComponent';
+
+    this.props.currentIframe.promise
+      .then(api => Promise.all([api.validate(), api.getSettings()]))
+      .then(([isValid, settings]) => {
+        if (isValid) {
+          this.props[method]({
+            id: params.component_id,
+            type: params.type,
+            component: this.state.component.merge({ settings: settings })
+          });
+
+          this.props.history.push(this.backLink());
+        }
+      });
+  }
+
   componentList() {
     const type = this.props.match.params.type;
     const componentList = {};
@@ -127,32 +162,6 @@ class RuleComponentEdit extends Component {
     return `/rules/${ruleId}`;
   }
 
-  handleSave(event) {
-    if (!this.isValid()) {
-      return false;
-    }
-
-    const params = this.props.match.params;
-
-    const method = isNewComponent(this.props)
-      ? 'addComponent'
-      : 'saveComponent';
-
-    this.props.currentIframe.promise
-      .then(api => Promise.all([api.validate(), api.getSettings()]))
-      .then(([isValid, settings]) => {
-        if (isValid) {
-          this.props[method]({
-            id: params.component_id,
-            type: params.type,
-            component: this.state.component.merge({ settings: settings })
-          });
-
-          this.props.history.push(this.backLink());
-        }
-      });
-  }
-
   render() {
     const props = this.props;
 
@@ -179,6 +188,14 @@ class RuleComponentEdit extends Component {
                   <option value="">Please select...</option>
                   {this.componentList()}
                 </select>
+                <br />
+                <label htmlFor="order">Order</label>
+                <input
+                  id="order"
+                  type="text"
+                  value={this.state.component.get('order') || '50'}
+                  onChange={this.handleInputChange.bind(this, 'order')}
+                />
               </fieldset>
             </form>
 

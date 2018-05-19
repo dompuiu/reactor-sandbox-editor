@@ -51,6 +51,41 @@ class DataElementEdit extends Component {
     });
   }
 
+  handleInputChange(fieldName, event) {
+    const dataElement = this.state.dataElement;
+    const target = event.target;
+    const value = target.type === 'checkbox' ? target.checked : target.value;
+    const newDataElement = dataElement.set(fieldName, value);
+
+    this.setState({
+      dataElement: newDataElement
+    });
+  }
+
+  handleSave(event) {
+    if (!this.isValid()) {
+      return false;
+    }
+
+    const params = this.props.match.params;
+    const method = isNewComponent(this.props)
+      ? 'addDataElement'
+      : 'saveDataElement';
+
+    this.props.currentIframe.promise
+      .then(api => Promise.all([api.validate(), api.getSettings()]))
+      .then(([isValid, settings]) => {
+        if (isValid) {
+          this.props[method]({
+            id: params.data_element_id,
+            dataElement: this.state.dataElement.merge({ settings: settings })
+          });
+
+          this.props.history.push(this.backLink());
+        }
+      });
+  }
+
   dataElementsList() {
     const componentList = {};
     const groupList = [];
@@ -89,13 +124,6 @@ class DataElementEdit extends Component {
     return '/data_elements/';
   }
 
-  handleNameChange(event) {
-    const dataElement = this.state.dataElement;
-    const newDataElement = dataElement.set('name', event.target.value);
-
-    this.setState({ dataElement: newDataElement });
-  }
-
   isValid() {
     const errors = {};
 
@@ -109,30 +137,6 @@ class DataElementEdit extends Component {
 
     this.setState({ errors: errors });
     return Object.keys(errors).length === 0;
-  }
-
-  handleSave(event) {
-    if (!this.isValid()) {
-      return false;
-    }
-
-    const params = this.props.match.params;
-    const method = isNewComponent(this.props)
-      ? 'addDataElement'
-      : 'saveDataElement';
-
-    this.props.currentIframe.promise
-      .then(api => Promise.all([api.validate(), api.getSettings()]))
-      .then(([isValid, settings]) => {
-        if (isValid) {
-          this.props[method]({
-            id: params.data_element_id,
-            dataElement: this.state.dataElement.merge({ settings: settings })
-          });
-
-          this.props.history.push(this.backLink());
-        }
-      });
   }
 
   render() {
@@ -157,7 +161,7 @@ class DataElementEdit extends Component {
                   id="dataElementName"
                   type="text"
                   value={this.state.dataElement.get('name') || ''}
-                  onChange={this.handleNameChange.bind(this)}
+                  onChange={this.handleInputChange.bind(this, 'name')}
                 />
                 <br />
                 <label htmlFor="dataElementType">Type</label>
@@ -169,6 +173,52 @@ class DataElementEdit extends Component {
                 >
                   <option value="">Please select...</option>
                   {this.dataElementsList()}
+                </select>
+                <br />
+                <label htmlFor="defaultValue">Default Value</label>
+                <input
+                  id="defaultValue"
+                  type="text"
+                  value={this.state.dataElement.get('defaultValue') || ''}
+                  onChange={this.handleInputChange.bind(this, 'defaultValue')}
+                />
+                <br />
+                <label htmlFor="forceLowerCase" className="pure-checkbox">
+                  <input
+                    id="forceLowerCase"
+                    type="checkbox"
+                    checked={this.state.dataElement.get('forceLowerCase') || ''}
+                    onChange={this.handleInputChange.bind(
+                      this,
+                      'forceLowerCase'
+                    )}
+                  />{' '}
+                  Force lower case
+                </label>
+                <br />
+                <label htmlFor="cleanText" className="pure-checkbox">
+                  <input
+                    id="cleanText"
+                    type="checkbox"
+                    checked={this.state.dataElement.get('cleanText') || ''}
+                    onChange={this.handleInputChange.bind(this, 'cleanText')}
+                  />{' '}
+                  Clean Text
+                </label>
+                <br />
+                <label htmlFor="storageDuration">Storage duration</label>
+                <select
+                  id="storageDuration"
+                  value={this.state.dataElement.get('storageDuration') || ''}
+                  onChange={this.handleInputChange.bind(
+                    this,
+                    'storageDuration'
+                  )}
+                >
+                  <option value=""> None </option>
+                  <option value="pageview"> Pageview </option>
+                  <option value="session"> Session </option>
+                  <option value="visitor"> Visitor </option>
                 </select>
               </fieldset>
             </form>
