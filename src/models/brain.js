@@ -18,8 +18,6 @@ export default {
   },
   effects: {
     async initialize(payload, rootState) {
-      this.pushDataDown(localStorage.get());
-
       const response = await fetch(
         `${environment.server.host}:${
           environment.server.port
@@ -28,8 +26,12 @@ export default {
 
       if (response.ok) {
         const data = await response.json();
+        const jsData = fromJS(data);
 
-        dispatch.registry.setRegistry(fromJS(data));
+        dispatch.registry.setRegistry(jsData.delete('currentExtensionName'));
+        localStorage.loadStateFor(jsData.get('currentExtensionName'));
+
+        this.pushDataDown(localStorage.get());
         this.setInitialized(true);
       }
     },
