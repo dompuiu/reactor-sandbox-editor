@@ -10,3 +10,7 @@
 .pure-menu-item {
   margin: 0 0.5rem;
 }
+
+.pure-menu-link {
+  cursor: pointer;
+}

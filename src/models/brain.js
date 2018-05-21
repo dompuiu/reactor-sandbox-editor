@@ -72,6 +72,30 @@ export default {
       dispatch.propertySettings.setPropertySettings(
         fromJS((payload.property && payload.property.settings) || {})
       );
+    },
+
+    async save() {
+      const response = await fetch(
+        `${environment.server.host}:${
+          environment.server.port
+        }/editor-container.js`,
+        {
+          method: 'POST',
+          cache: 'no-cache',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(localStorage.get())
+        }
+      );
+
+      if (response.ok) {
+        // window.location = `${environment.server.host}:${
+        // environment.server.port
+        // }/libSandbox.html`;
+      } else {
+        alert('Something went bad!');
+      }
     }
   }
 };

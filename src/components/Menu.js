@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import { Link, withRouter } from 'react-router-dom';
 import './Menu.css';
 
-const Menu = ({ match }) => (
+const Menu = ({ match, save }) => (
   <div className="main-menu">
     <div className="pure-menu pure-menu-horizontal">
       <Link className="pure-menu-heading pure-menu-link" to="/">
@@ -61,12 +61,19 @@ const Menu = ({ match }) => (
             Settings
           </Link>
         </li>
+        <li className="pure-menu-item">
+          <a className="pure-menu-link" onClick={save}>
+            Save and Exit
+          </a>
+        </li>
       </ul>
     </div>
   </div>
 );
 
 const mapState = state => ({});
-const mapDispatch = () => ({});
+const mapDispatch = ({ brain: { save } }) => ({
+  save: () => save()
+});
 
 export default withRouter(connect(mapState, mapDispatch)(Menu));
