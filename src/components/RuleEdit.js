@@ -52,6 +52,10 @@ class RuleEdit extends Component {
     return Object.keys(errors).length === 0;
   }
 
+  componentWillUnmount() {
+    this.props.setCurrentRule(null);
+  }
+
   handleSave(event) {
     if (!this.isValid()) {
       return false;
