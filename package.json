@@ -12,9 +12,12 @@
     "react-scripts": "1.1.1"
   },
   "scripts": {
+    "reactor-bridge-update":
+      "mkdir -p public/extensionbridge && cp node_modules/@adobe/reactor-bridge/dist/extensionbridge-child.js public/extensionbridge/extensionbridge-child.js",
     "prepare": "npm run build",
-    "start": "react-scripts start",
-    "build": "react-scripts build && mv build/index.html build/editor.html",
+    "start": "npm run reactor-bridge-update && react-scripts start",
+    "build":
+      "npm run reactor-bridge-update && react-scripts build && mv build/index.html build/editor.html",
     "test": "react-scripts test --env=jsdom",
     "eject": "react-scripts eject"
   }
