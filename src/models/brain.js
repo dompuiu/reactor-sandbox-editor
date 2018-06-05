@@ -93,9 +93,9 @@ export default {
       );
 
       if (response.ok) {
-        // window.location = `${environment.server.host}:${
-        // environment.server.port
-        // }/libSandbox.html`;
+        window.location = `${environment.server.host}:${
+          environment.server.port
+        }/libSandbox.html`;
       } else {
         alert('Something went bad!');
       }

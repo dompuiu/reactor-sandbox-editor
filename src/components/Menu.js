@@ -3,6 +3,19 @@ import { connect } from 'react-redux';
 import { Link, withRouter } from 'react-router-dom';
 import './Menu.css';
 
+const isSavedEnabled = match => {
+  return (
+    [
+      '/',
+      '/extension_configurations',
+      '/data_elements',
+      '/rules',
+      '/property_settings',
+      '/settings'
+    ].indexOf(match.path) !== -1
+  );
+};
+
 const Menu = ({ match, save }) => (
   <div className="main-menu">
     <div className="pure-menu pure-menu-horizontal">
@@ -61,11 +74,13 @@ const Menu = ({ match, save }) => (
             Settings
           </Link>
         </li>
-        <li className="pure-menu-item">
-          <a className="pure-menu-link" onClick={save}>
-            Save and Exit
-          </a>
-        </li>
+        {isSavedEnabled(match) ? (
+          <li className="pure-menu-item">
+            <a className="pure-menu-link" onClick={save}>
+              Save and Exit
+            </a>
+          </li>
+        ) : null}
       </ul>
     </div>
   </div>
