@@ -32,7 +32,10 @@ export default {
         localStorage.loadStateFor(jsData.get('currentExtensionName'));
 
         this.pushDataDown(localStorage.get());
-        this.setInitialized(true);
+
+        setTimeout(() => {
+          this.setInitialized(true);
+        }, 0);
       }
     },
 

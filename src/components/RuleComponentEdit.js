@@ -3,7 +3,6 @@ import { Link, withRouter } from 'react-router-dom';
 import { connect } from 'react-redux';
 import { Map, List } from 'immutable';
 import './ComponentEditSidebar.css';
-import once from './helpers/once';
 import ComponentIframe from './ComponentIframe';
 
 const isNewComponent = props => {
@@ -16,10 +15,6 @@ const isNewComponent = props => {
     componentId >= (props.currentRule.get(type) || List()).size
   );
 };
-
-const setCurrentRuleOnce = once(props => {
-  props.setCurrentRule(currentRule(props));
-});
 
 const currentRule = props => {
   const ruleId = props.match.params.rule_id;
@@ -58,7 +53,7 @@ class RuleComponentEdit extends Component {
   }
 
   static getDerivedStateFromProps(nextProps, prevState) {
-    setCurrentRuleOnce(nextProps);
+    nextProps.setCurrentRule(currentRule(nextProps));
 
     return prevState.component
       ? prevState
