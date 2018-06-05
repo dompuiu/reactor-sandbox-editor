@@ -21,3 +21,5 @@ yarn-debug.log*
 yarn-error.log*
 
 .vscode
+
+reactor-sandbox-rule-editor-1.0.0.tgz
