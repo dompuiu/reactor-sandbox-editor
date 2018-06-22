@@ -9,7 +9,7 @@ export default {
       return payload;
     },
     addRule(state, payload) {
-      const rules = state.push(payload.rule);
+      const rules = state.push(payload.rule.set('rule_id', `RL${Date.now()}`));
       localStorage.update('rules', rules);
       return rules;
     },
