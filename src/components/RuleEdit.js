@@ -3,6 +3,7 @@ import './RuleEdit.css';
 import { Link, withRouter } from 'react-router-dom';
 import { connect } from 'react-redux';
 import { List, Map } from 'immutable';
+import { withLastLocation } from 'react-router-last-location';
 import RuleComponentsList from './RuleComponentsList';
 
 const isNewRule = props => {
@@ -10,15 +11,41 @@ const isNewRule = props => {
   return ruleId === 'new' || !props.rules || ruleId >= props.rules.size;
 };
 
+// Need to check from where the user is coming. If he returns from a rule
+// component edit view, we need to load the currentRule from the state.
+// We need to check the location once for every page load of this view.
+let locationChecked = false;
+const checkLastLocation = location => {
+  if (locationChecked) {
+    return true;
+  }
+
+  locationChecked = true;
+
+  if (!location) {
+    return false;
+  }
+
+  return location.pathname.match(
+    /^\/rules\/.*\/(:?events|conditions|actions)\/.*$/
+  );
+};
+
 const currentRule = props => {
   const ruleId = props.match.params.rule_id;
   let rule;
 
-  if (props.currentRule && props.currentRule.get('rule_id') === ruleId) {
-    rule = props.currentRule;
+  let currentRule = props.currentRule;
+  if (!checkLastLocation(props.lastLocation)) {
+    currentRule = null;
+  }
+
+  if (currentRule && currentRule.get('rule_id') === ruleId) {
+    rule = currentRule;
   } else {
     rule = (props.rules || List()).get(ruleId) || Map();
   }
+
   rule = rule.set('rule_id', ruleId);
   return rule;
 };
@@ -32,7 +59,7 @@ class RuleEdit extends Component {
     };
   }
 
-  static getDerivedStateFromProps(nextProps, prevState) {
+  static getDerivedStateFromProps(nextProps) {
     const rule = currentRule(nextProps);
 
     return {
@@ -53,10 +80,10 @@ class RuleEdit extends Component {
   }
 
   componentWillUnmount() {
-    this.props.setCurrentRule(null);
+    locationChecked = false;
   }
 
-  handleSave(event) {
+  handleSave() {
     if (!this.isValid()) {
       return false;
     }
@@ -165,11 +192,13 @@ const mapState = state => {
 
 const mapDispatch = ({
   rules: { saveRule, addRule },
-  currentRule: { setCurrentRule, deleteComponent }
+  currentRule: { setCurrentRule }
 }) => ({
   addRule: payload => addRule(payload),
   saveRule: payload => saveRule(payload),
   setCurrentRule: payload => setCurrentRule(payload)
 });
 
-export default withRouter(connect(mapState, mapDispatch)(RuleEdit));
+export default withRouter(
+  connect(mapState, mapDispatch)(withLastLocation(RuleEdit))
+);

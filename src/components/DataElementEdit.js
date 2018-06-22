@@ -62,7 +62,7 @@ class DataElementEdit extends Component {
     });
   }
 
-  handleSave(event) {
+  handleSave() {
     if (!this.isValid()) {
       return false;
     }

@@ -9,7 +9,8 @@
     "react-dom": "^16.3.0",
     "react-redux": "^5.0.7",
     "react-router-dom": "^4.2.2",
-    "react-scripts": "1.1.1"
+    "react-router-last-location": "^1.1.0",
+    "react-scripts": "^1.1.4"
   },
   "scripts": {
     "reactor-bridge-update": "mkdir -p public/extensionbridge && cp node_modules/@adobe/reactor-bridge/dist/extensionbridge-child.js public/extensionbridge/extensionbridge-child.js",
