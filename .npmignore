@@ -5,3 +5,4 @@
 reactor-sandbox-rule-editor-*.tgz
 src
 public
+.idea
