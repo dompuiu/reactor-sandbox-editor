@@ -20,12 +20,12 @@ const currentRule = props => {
   const ruleId = props.match.params.rule_id;
   let rule;
 
-  if (props.currentRule && props.currentRule.get('rule_id') === ruleId) {
+  if (props.currentRule && props.currentRule.get('id') === ruleId) {
     rule = props.currentRule;
   } else {
     rule = (props.rules || List()).get(ruleId) || Map();
   }
-  rule = rule.set('rule_id', ruleId);
+  rule = rule.set('id', ruleId);
   return rule;
 };
 

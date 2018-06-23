@@ -9,13 +9,13 @@ export default {
       return payload;
     },
     addRule(state, payload) {
-      const rules = state.push(payload.rule.set('rule_id', `RL${Date.now()}`));
+      const rules = state.push(payload.rule.set('id', `RL${Date.now()}`));
       localStorage.update('rules', rules);
       return rules;
     },
     saveRule(state, payload) {
       const rules = state.update(payload.id, item =>
-        payload.rule.set('rule_id', `RL${Date.now()}`)
+        payload.rule.set('id', `RL${Date.now()}`)
       );
       localStorage.update('rules', rules);
       return rules;

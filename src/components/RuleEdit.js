@@ -40,13 +40,13 @@ const currentRule = props => {
     currentRule = null;
   }
 
-  if (currentRule && currentRule.get('rule_id') === ruleId) {
+  if (currentRule && currentRule.get('id') === ruleId) {
     rule = currentRule;
   } else {
     rule = (props.rules || List()).get(ruleId) || Map();
   }
 
-  rule = rule.set('rule_id', ruleId);
+  rule = rule.set('id', ruleId);
   return rule;
 };
 
