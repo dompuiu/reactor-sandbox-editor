@@ -14,7 +14,9 @@ export default {
       return rules;
     },
     saveRule(state, payload) {
-      const rules = state.update(payload.id, item => payload.rule);
+      const rules = state.update(payload.id, item =>
+        payload.rule.set('rule_id', `RL${Date.now()}`)
+      );
       localStorage.update('rules', rules);
       return rules;
     },
