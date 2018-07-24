@@ -58,8 +58,8 @@ class RuleComponentEdit extends Component {
     return prevState.component
       ? prevState
       : {
-        component: getComponent(nextProps)
-      };
+          component: getComponent(nextProps)
+        };
   }
 
   handleComponentTypeChange(event) {
@@ -166,6 +166,8 @@ class RuleComponentEdit extends Component {
       this.state.component.get('modulePath')
     ]);
 
+    const extensionName = this.state.component.get('modulePath').split('/')[0];
+
     return (
       <div className="pure-g component-edit-container">
         <div className="pure-u-1-4">
@@ -211,6 +213,9 @@ class RuleComponentEdit extends Component {
         <div className="pure-u-3-4">
           <ComponentIframe
             component={componentIframeDetails}
+            extensionConfiguration={props.extensionConfigurations
+              .filter(i => i.get('name') === extensionName)
+              .first()}
             settings={this.state.component.get('settings')}
             server={props.registry.getIn(['environment', 'server'])}
           />
@@ -225,7 +230,8 @@ const mapState = state => {
     rules: state.rules,
     currentRule: state.currentRule,
     currentIframe: state.currentIframe,
-    registry: state.registry
+    registry: state.registry,
+    extensionConfigurations: state.extensionConfigurations
   };
 };
 

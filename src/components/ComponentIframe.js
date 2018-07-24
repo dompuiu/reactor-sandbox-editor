@@ -42,12 +42,26 @@ class ComponentIframe extends Component {
       return;
     }
 
+    const extensionInitOptions = {
+      settings: this.props.settings && this.props.settings.toJS(),
+      company: {
+        orgId: 'ABCDEFGHIJKLMNOPQRSTUVWX@AdobeOrg'
+      },
+      propertySettings: this.props.propertySettings.toJS(),
+      tokens: {
+        imsAccess: 'fake-ims-access-token'
+      }
+    };
+
+    if (this.props.extensionConfiguration) {
+      extensionInitOptions.extensionSettings =
+        this.props.extensionConfiguration.get('settings').toJS();
+    }
+
     const iframeApi = loadIframe({
       url: url,
       container: this.dom,
-      extensionInitOptions: {
-        settings: this.props.settings && this.props.settings.toJS()
-      },
+      extensionInitOptions: extensionInitOptions,
       connectionTimeoutDuration: 30000,
       openCodeEditor(options = {}) {
         return new Promise((resolve, reject) => {
@@ -78,7 +92,9 @@ class ComponentIframe extends Component {
   }
 }
 
-const mapState = state => ({});
+const mapState = state => ({
+  propertySettings: state.propertySettings
+});
 const mapDispatch = ({
   currentIframe: { setCurrentIframe },
   modals: { openCodeEditorModal, openDataElementSelectorModal }
