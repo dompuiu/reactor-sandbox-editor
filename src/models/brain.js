@@ -56,24 +56,45 @@ export default {
     },
 
     clearContainerData(payload, rootState) {
-      this.pushDataDown({
-        extensions: [],
-        rules: [],
-        dataElements: [],
-        property: { settings: {} }
-      });
+      this.pushDataDown(
+        Map({
+          extensions: [],
+          rules: [],
+          dataElements: [],
+          property: { settings: {} }
+        })
+      );
 
       this.setContainerDataReseted('success');
     },
 
     pushDataDown(payload, rootState) {
       dispatch.extensionConfigurations.setExtensionConfigurations(
-        fromJS(payload.extensions)
+        fromJS(payload.get('extensions'))
       );
-      dispatch.rules.setRules(fromJS(payload.rules));
-      dispatch.dataElements.setDataElements(fromJS(payload.dataElements));
+      dispatch.rules.setRules(fromJS(payload.get('rules')));
+      dispatch.dataElements.setDataElements(
+        fromJS(payload.get('dataElements'))
+      );
+
       dispatch.propertySettings.setPropertySettings(
-        fromJS((payload.property && payload.property.settings) || {})
+        fromJS(
+          payload.getIn(['property', 'settings']) || {
+            domains: ['example.com']
+          }
+        )
+      );
+      dispatch.otherSettings.setOtherSettings(
+        fromJS(
+          payload.get('otherSettings') || {
+            company: {
+              orgId: 'ABCDEFGHIJKLMNOPQRSTUVWX@AdobeOrg'
+            },
+            tokens: {
+              imsAccess: 'fake-ims-access-token'
+            }
+          }
+        )
       );
     },
 
@@ -88,7 +109,7 @@ export default {
           headers: {
             'Content-Type': 'application/json'
           },
-          body: JSON.stringify(localStorage.get())
+          body: JSON.stringify(localStorage.get().delete('otherSettings'))
         }
       );
 

@@ -80,7 +80,9 @@ class PropertySettings extends Component {
             <div className="pure-control-group">
               <label htmlFor="domainsList">Domains List</label>
               <input
-                className={this.state.errors.domains ? 'border-error' : ''}
+                className={`pure-input-1-3 ${
+                  this.state.errors.domains ? 'border-error' : ''
+                }`}
                 id="domainsList"
                 type="text"
                 value={this.state.propertySettings.get('domains') || ''}
@@ -113,4 +115,9 @@ const mapDispatch = ({ propertySettings: { setPropertySettings } }) => ({
   setPropertySettings: payload => setPropertySettings(payload)
 });
 
-export default withRouter(connect(mapState, mapDispatch)(PropertySettings));
+export default withRouter(
+  connect(
+    mapState,
+    mapDispatch
+  )(PropertySettings)
+);

@@ -1,12 +1,12 @@
-import { Map } from 'immutable';
+import { fromJS, Map } from 'immutable';
 
 export default {
   extensionName: null,
-  state: {
+  state: Map({
     dataElements: [],
     rules: [],
     extensions: []
-  },
+  }),
   get() {
     return this.state;
   },
@@ -17,7 +17,7 @@ export default {
       localStorage.getItem(`sandbox-rule-editor-container-${extensionName}`)
     );
     if (state) {
-      this.state = state;
+      this.state = fromJS(state);
     }
   },
   update(key, value) {
@@ -29,12 +29,12 @@ export default {
     } else {
       value = value.toJS();
     }
-    this.state[key] = value;
+    this.state = this.state.set(key, value);
 
     if (this.extensionName) {
       localStorage.setItem(
         `sandbox-rule-editor-container-${this.extensionName}`,
-        JSON.stringify(this.state)
+        JSON.stringify(this.state.toJS())
       );
     }
   }

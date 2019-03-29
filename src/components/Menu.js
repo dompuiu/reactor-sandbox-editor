@@ -10,8 +10,7 @@ const isSavedEnabled = match => {
       '/extension_configurations',
       '/data_elements',
       '/rules',
-      '/property_settings',
-      '/settings'
+      '/property_settings'
     ].indexOf(match.path) !== -1
   );
 };
@@ -91,4 +90,9 @@ const mapDispatch = ({ brain: { save } }) => ({
   save: () => save()
 });
 
-export default withRouter(connect(mapState, mapDispatch)(Menu));
+export default withRouter(
+  connect(
+    mapState,
+    mapDispatch
+  )(Menu)
+);

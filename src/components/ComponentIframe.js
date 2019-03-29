@@ -44,18 +44,15 @@ class ComponentIframe extends Component {
 
     const extensionInitOptions = {
       settings: this.props.settings && this.props.settings.toJS(),
-      company: {
-        orgId: 'ABCDEFGHIJKLMNOPQRSTUVWX@AdobeOrg'
-      },
+      company: this.props.otherSettings.get('company').toJS(),
       propertySettings: this.props.propertySettings.toJS(),
-      tokens: {
-        imsAccess: 'fake-ims-access-token'
-      }
+      tokens: this.props.otherSettings.get('tokens').toJS()
     };
 
     if (this.props.extensionConfiguration) {
-      extensionInitOptions.extensionSettings =
-        this.props.extensionConfiguration.get('settings').toJS();
+      extensionInitOptions.extensionSettings = this.props.extensionConfiguration
+        .get('settings')
+        .toJS();
     }
 
     const iframeApi = loadIframe({
@@ -93,7 +90,8 @@ class ComponentIframe extends Component {
 }
 
 const mapState = state => ({
-  propertySettings: state.propertySettings
+  propertySettings: state.propertySettings,
+  otherSettings: state.otherSettings
 });
 const mapDispatch = ({
   currentIframe: { setCurrentIframe },
@@ -104,4 +102,7 @@ const mapDispatch = ({
   openDataElementSelectorModal: payload => openDataElementSelectorModal(payload)
 });
 
-export default connect(mapState, mapDispatch)(ComponentIframe);
+export default connect(
+  mapState,
+  mapDispatch
+)(ComponentIframe);

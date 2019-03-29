@@ -1,9 +1,11 @@
 import React from 'react';
 import { withRouter } from 'react-router-dom';
 import { connect } from 'react-redux';
+import OtherSettings from './OtherSettings';
 
 const Main = ({ brain, loadContainerData, clearContainerData }) => (
   <div>
+    <OtherSettings />
     <div className="main-container">
       <p>The data used inside this editor is loaded from `localStorage`.</p>
       <p>
@@ -18,7 +20,8 @@ const Main = ({ brain, loadContainerData, clearContainerData }) => (
         </button>
         {brain.get('containerDataLoaded') != null ? (
           <span className={`status-${brain.get('containerDataLoaded')}`}>
-            <br />Last import status:{' '}
+            <br />
+            Last import status:{' '}
             <strong>{brain.get('containerDataLoaded')}</strong>.
           </span>
         ) : null}
@@ -34,7 +37,8 @@ const Main = ({ brain, loadContainerData, clearContainerData }) => (
         </button>
         {brain.get('containerDataReseted') != null ? (
           <span className={`status-${brain.get('containerDataReseted')}`}>
-            <br />Last reset status:{' '}
+            <br />
+            Last reset status:{' '}
             <strong>{brain.get('containerDataReseted')}</strong>.
           </span>
         ) : null}
@@ -52,4 +56,9 @@ const mapDispatch = ({ brain: { loadContainerData, clearContainerData } }) => ({
   clearContainerData: () => clearContainerData()
 });
 
-export default withRouter(connect(mapState, mapDispatch)(Main));
+export default withRouter(
+  connect(
+    mapState,
+    mapDispatch
+  )(Main)
+);
