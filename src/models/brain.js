@@ -99,6 +99,14 @@ export default {
     },
 
     async save() {
+      const localStorageData = localStorage.get();
+      const containerData = localStorageData
+        .setIn(
+          ['company', 'orgId'],
+          localStorageData.get('otherSettings').company.orgId
+        )
+        .delete('otherSettings');
+
       const response = await fetch(
         `${environment.server.host}:${
           environment.server.port
@@ -109,7 +117,7 @@ export default {
           headers: {
             'Content-Type': 'application/json'
           },
-          body: JSON.stringify(localStorage.get().delete('otherSettings'))
+          body: JSON.stringify(containerData)
         }
       );
 
