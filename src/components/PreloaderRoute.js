@@ -29,4 +29,9 @@ const mapState = state => ({
 
 const mapDispatch = () => ({});
 
-export default withRouter(connect(mapState, mapDispatch)(PreloaderRoute));
+export default withRouter(
+  connect(
+    mapState,
+    mapDispatch
+  )(PreloaderRoute)
+);

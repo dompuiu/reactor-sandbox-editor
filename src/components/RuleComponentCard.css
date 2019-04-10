@@ -16,6 +16,15 @@
   margin-top: 1rem;
 }
 
+button.icono-cross {
+  background: none;
+  border: none;
+}
+
+button.icono-cross:focus {
+  outline: none;
+}
+
 .card-extension-display-name,
 .card-display-name {
   padding: 0.5rem 0 0 0;

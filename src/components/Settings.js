@@ -3,9 +3,15 @@ import { withRouter } from 'react-router-dom';
 import { connect } from 'react-redux';
 import OtherSettings from './OtherSettings';
 
-const Main = ({ brain, loadContainerData, clearContainerData }) => (
+const Main = ({
+  brain,
+  orgId,
+  imsAccess,
+  loadContainerData,
+  clearContainerData
+}) => (
   <div>
-    <OtherSettings />
+    <OtherSettings key={`${orgId}${imsAccess}`} />
     <div className="main-container">
       <p>The data used inside this editor is loaded from `localStorage`.</p>
       <p>
@@ -13,6 +19,7 @@ const Main = ({ brain, loadContainerData, clearContainerData }) => (
         <strong>`.sandbox/container.js`</strong> file click on the `Import data`
         button.
         <button
+          type="button"
           className="pure-button pure-button-primary"
           onClick={loadContainerData}
         >
@@ -30,6 +37,7 @@ const Main = ({ brain, loadContainerData, clearContainerData }) => (
       <p>
         If you want to reset current data click on the `Reset data` button.
         <button
+          type="button"
           className="pure-button pure-button-primary"
           onClick={clearContainerData}
         >
@@ -48,7 +56,9 @@ const Main = ({ brain, loadContainerData, clearContainerData }) => (
 );
 
 const mapState = state => ({
-  brain: state.brain
+  brain: state.brain,
+  orgId: state.otherSettings.getIn(['company', 'orgId']),
+  imsAccess: state.otherSettings.getIn(['tokens', 'imsAccess'])
 });
 
 const mapDispatch = ({ brain: { loadContainerData, clearContainerData } }) => ({

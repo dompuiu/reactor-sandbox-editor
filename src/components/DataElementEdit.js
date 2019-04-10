@@ -4,20 +4,27 @@ import { connect } from 'react-redux';
 import { Map, List } from 'immutable';
 import './ComponentEditSidebar.css';
 import ComponentIframe from './ComponentIframe';
+import Backdrop from './Backdrop';
 
-const isNewComponent = props => {
-  const dataElementId = props.match.params.data_element_id;
-
+const isNewComponent = ({
+  match: {
+    params: { data_element_id: dataElementId }
+  },
+  dataElements
+}) => {
   return (
-    dataElementId === 'new' ||
-    dataElementId >= (props.dataElements || List()).size
+    dataElementId === 'new' || dataElementId >= (dataElements || List()).size
   );
 };
 
-const getDataElement = props => {
-  const dataElementId = props.match.params.data_element_id;
+const getDataElement = ({
+  match: {
+    params: { data_element_id: dataElementId }
+  },
+  dataElements
+}) => {
   return (
-    (props.dataElements || List()).get(dataElementId) ||
+    (dataElements || List()).get(dataElementId) ||
     Map({
       modulePath: '',
       settings: null
@@ -26,25 +33,25 @@ const getDataElement = props => {
 };
 
 class DataElementEdit extends Component {
+  static backLink() {
+    return '/data_elements/';
+  }
+
   constructor(props) {
     super(props);
 
     this.state = {
+      waitingForExtensionResponse: false,
+      dataElement: getDataElement(props),
       errors: {}
     };
   }
 
-  static getDerivedStateFromProps(nextProps, prevState) {
-    return prevState.dataElement
-      ? prevState
-      : {
-        dataElement: getDataElement(nextProps)
-      };
-  }
-
   handleComponentTypeChange(event) {
+    const { dataElement } = this.state;
+
     this.setState({
-      dataElement: this.state.dataElement.merge({
+      dataElement: dataElement.merge({
         settings: null,
         modulePath: event.target.value
       })
@@ -52,8 +59,9 @@ class DataElementEdit extends Component {
   }
 
   handleInputChange(fieldName, event) {
-    const dataElement = this.state.dataElement;
-    const target = event.target;
+    const { dataElement } = this.state;
+    const { target } = event;
+
     const value = target.type === 'checkbox' ? target.checked : target.value;
     const newDataElement = dataElement.set(fieldName, value);
 
@@ -67,30 +75,50 @@ class DataElementEdit extends Component {
       return false;
     }
 
-    const params = this.props.match.params;
-    const method = isNewComponent(this.props)
-      ? 'addDataElement'
-      : 'saveDataElement';
+    const {
+      addDataElement,
+      saveDataElement,
+      currentIframe,
+      history,
+      match: { params }
+    } = this.props;
 
-    this.props.currentIframe.promise
+    const { dataElement } = this.state;
+
+    const method = isNewComponent(this.props)
+      ? addDataElement
+      : saveDataElement;
+
+    this.setState({
+      waitingForExtensionResponse: true
+    });
+
+    currentIframe.promise
       .then(api => Promise.all([api.validate(), api.getSettings()]))
       .then(([isValid, settings]) => {
         if (isValid) {
-          this.props[method]({
+          method({
             id: params.data_element_id,
-            dataElement: this.state.dataElement.merge({ settings: settings })
+            dataElement: dataElement.merge({ settings })
           });
 
-          this.props.history.push(this.backLink());
+          history.push(this.constructor.backLink());
+        } else {
+          this.setState({
+            waitingForExtensionResponse: false
+          });
         }
       });
+
+    return true;
   }
 
   dataElementsList() {
     const componentList = {};
     const groupList = [];
+    const { registry } = this.props;
 
-    (this.props.registry.getIn(['components', 'dataElements']) || List())
+    (registry.getIn(['components', 'dataElements']) || List())
       .valueSeq()
       .forEach(v => {
         if (!componentList[v.get('extensionDisplayName')]) {
@@ -120,77 +148,86 @@ class DataElementEdit extends Component {
     return groupList;
   }
 
-  backLink() {
-    return '/data_elements/';
-  }
-
   isValid() {
     const errors = {};
+    const { dataElement } = this.state;
+    const { currentIframe } = this.props;
 
-    if (!this.state.dataElement.get('name')) {
+    if (!dataElement.get('name')) {
       errors.name = true;
     }
 
-    if (
-      !this.state.dataElement.get('modulePath') ||
-      !this.props.currentIframe.promise
-    ) {
+    if (!dataElement.get('modulePath') || !currentIframe.promise) {
       errors.modulePath = true;
     }
 
-    this.setState({ errors: errors });
+    this.setState({ errors });
     return Object.keys(errors).length === 0;
   }
 
   render() {
-    const props = this.props;
+    const { registry } = this.props;
 
-    const componentIframeDetails = props.registry.getIn([
+    const { waitingForExtensionResponse, errors, dataElement } = this.state;
+
+    const componentIframeDetails = registry.getIn([
       'components',
       'dataElements',
-      this.state.dataElement.get('modulePath')
+      dataElement.get('modulePath')
     ]);
 
     return (
       <div className="pure-g component-edit-container">
+        {waitingForExtensionResponse ? (
+          <Backdrop message="Waiting for the extension response..." />
+        ) : null}
         <div className="pure-u-1-4">
           <div className="component-edit-sidebar">
             <form className="pure-form pure-form-stacked">
               <fieldset>
                 <h4>Data Element Details</h4>
-                <label htmlFor="dataElementName">Name</label>
-                <input
-                  className={this.state.errors.name ? 'border-error' : ''}
-                  id="dataElementName"
-                  type="text"
-                  value={this.state.dataElement.get('name') || ''}
-                  onChange={this.handleInputChange.bind(this, 'name')}
-                />
+                <label htmlFor="dataElementName">
+                  <span>Name</span>
+                  <input
+                    className={errors.name ? 'border-error' : ''}
+                    id="dataElementName"
+                    type="text"
+                    value={dataElement.get('name') || ''}
+                    onChange={this.handleInputChange.bind(this, 'name')}
+                  />
+                </label>
                 <br />
-                <label htmlFor="dataElementType">Type</label>
-                <select
-                  id="dataElementType"
-                  className={this.state.errors.modulePath ? 'border-error' : ''}
-                  value={this.state.dataElement.get('modulePath')}
-                  onChange={this.handleComponentTypeChange.bind(this)}
-                >
-                  <option value="">Please select...</option>
-                  {this.dataElementsList()}
-                </select>
+
+                <label htmlFor="dataElementType">
+                  <span>Type</span>
+                  <select
+                    id="dataElementType"
+                    className={errors.modulePath ? 'border-error' : ''}
+                    value={dataElement.get('modulePath')}
+                    onChange={this.handleComponentTypeChange.bind(this)}
+                  >
+                    <option value="">Please select...</option>
+                    {this.dataElementsList()}
+                  </select>
+                </label>
                 <br />
-                <label htmlFor="defaultValue">Default Value</label>
-                <input
-                  id="defaultValue"
-                  type="text"
-                  value={this.state.dataElement.get('defaultValue') || ''}
-                  onChange={this.handleInputChange.bind(this, 'defaultValue')}
-                />
+
+                <label htmlFor="defaultValue">
+                  <span>Default Value</span>
+                  <input
+                    id="defaultValue"
+                    type="text"
+                    value={dataElement.get('defaultValue') || ''}
+                    onChange={this.handleInputChange.bind(this, 'defaultValue')}
+                  />
+                </label>
                 <br />
+
                 <label htmlFor="forceLowerCase" className="pure-checkbox">
                   <input
                     id="forceLowerCase"
                     type="checkbox"
-                    checked={this.state.dataElement.get('forceLowerCase') || ''}
+                    checked={dataElement.get('forceLowerCase') || ''}
                     onChange={this.handleInputChange.bind(
                       this,
                       'forceLowerCase'
@@ -203,38 +240,41 @@ class DataElementEdit extends Component {
                   <input
                     id="cleanText"
                     type="checkbox"
-                    checked={this.state.dataElement.get('cleanText') || ''}
+                    checked={dataElement.get('cleanText') || ''}
                     onChange={this.handleInputChange.bind(this, 'cleanText')}
                   />{' '}
                   Clean Text
                 </label>
                 <br />
-                <label htmlFor="storageDuration">Storage duration</label>
-                <select
-                  id="storageDuration"
-                  value={this.state.dataElement.get('storageDuration') || ''}
-                  onChange={this.handleInputChange.bind(
-                    this,
-                    'storageDuration'
-                  )}
-                >
-                  <option value=""> None </option>
-                  <option value="pageview"> Pageview </option>
-                  <option value="session"> Session </option>
-                  <option value="visitor"> Visitor </option>
-                </select>
+                <label htmlFor="storageDuration">
+                  <span>Storage duration</span>
+                  <select
+                    id="storageDuration"
+                    value={dataElement.get('storageDuration') || ''}
+                    onChange={this.handleInputChange.bind(
+                      this,
+                      'storageDuration'
+                    )}
+                  >
+                    <option value=""> None </option>
+                    <option value="pageview"> Pageview </option>
+                    <option value="session"> Session </option>
+                    <option value="visitor"> Visitor </option>
+                  </select>
+                </label>
               </fieldset>
             </form>
 
             <div className="button-container">
               <button
+                type="button"
                 className="pure-button-primary pure-button"
                 onClick={this.handleSave.bind(this)}
               >
                 Save
               </button>
               &nbsp;
-              <Link to={this.backLink()} className="pure-button">
+              <Link to={this.constructor.backLink()} className="pure-button">
                 Cancel
               </Link>
             </div>
@@ -243,8 +283,8 @@ class DataElementEdit extends Component {
         <div className="pure-u-3-4">
           <ComponentIframe
             component={componentIframeDetails}
-            settings={this.state.dataElement.get('settings')}
-            server={props.registry.getIn(['environment', 'server'])}
+            settings={dataElement.get('settings')}
+            server={registry.getIn(['environment', 'server'])}
           />
         </div>
       </div>
@@ -267,4 +307,9 @@ const mapDispatch = ({
   addDataElement: payload => addDataElement(payload)
 });
 
-export default withRouter(connect(mapState, mapDispatch)(DataElementEdit));
+export default withRouter(
+  connect(
+    mapState,
+    mapDispatch
+  )(DataElementEdit)
+);

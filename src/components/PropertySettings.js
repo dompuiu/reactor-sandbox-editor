@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Map, List } from 'immutable';
+import { List } from 'immutable';
 import { withRouter } from 'react-router-dom';
 import { connect } from 'react-redux';
 import './PropertySettings.css';
@@ -9,25 +9,14 @@ class PropertySettings extends Component {
     super(props);
 
     this.state = {
-      propertySettings: Map(),
-      errors: {}
-    };
-  }
-
-  static getDerivedStateFromProps(nextProps, prevState) {
-    let nextPropertiesSettings = nextProps.propertySettings;
-    if (nextPropertiesSettings.get('domains')) {
-      nextPropertiesSettings = nextPropertiesSettings.set(
+      propertySettings: props.propertySettings.set(
         'domains',
-        nextPropertiesSettings
+        props.propertySettings
           .get('domains')
           .toJS()
           .join(', ')
-      );
-    }
-
-    return {
-      propertySettings: nextPropertiesSettings
+      ),
+      errors: {}
     };
   }
 
@@ -93,12 +82,12 @@ class PropertySettings extends Component {
               </span>
             </div>
             <div className="pure-controls">
-              <a
+              <button
                 className="pure-button pure-button-primary"
                 onClick={this.handleSave.bind(this)}
               >
                 Save
-              </a>
+              </button>
             </div>
           </fieldset>
         </form>

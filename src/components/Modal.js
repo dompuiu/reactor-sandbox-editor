@@ -1,47 +1,33 @@
-import React, { Component } from 'react';
-import PropTypes from 'prop-types';
+import React from 'react';
 import './Modal.css';
 
-class Modal extends Component {
-  render() {
-    if (!this.props.show) {
-      return null;
-    }
-
-    return (
-      <div className="backdrop">
-        <div className="modal">
-          <div className="header">
-            <div className="title">{this.props.title}</div>
-            <div
-              onClick={this.props.onClose}
-              title="Delete"
-              className="icono-cross"
-            />
-          </div>
-          {this.props.children}
-          <div className="footer">
-            <button
-              className="pure-button-primary pure-button"
-              onClick={this.props.onSave}
-            >
-              Save
-            </button>
-            &nbsp;
-            <button className="pure-button" onClick={this.props.onClose}>
-              Cancel
-            </button>
-          </div>
+export default ({ show, title, children, onSave, onClose }) =>
+  show ? (
+    <div className="backdrop">
+      <div className="modal">
+        <div className="header">
+          <div className="title">{title}</div>
+          <button
+            type="button"
+            onClick={onClose}
+            title="Delete"
+            className="icono-cross"
+          />
+        </div>
+        {children}
+        <div className="footer">
+          <button
+            type="button"
+            className="pure-button-primary pure-button"
+            onClick={onSave}
+          >
+            Save
+          </button>
+          &nbsp;
+          <button type="button" className="pure-button" onClick={onClose}>
+            Cancel
+          </button>
         </div>
       </div>
-    );
-  }
-}
-
-Modal.propTypes = {
-  onClose: PropTypes.func.isRequired,
-  show: PropTypes.bool,
-  children: PropTypes.node
-};
-
-export default Modal;
+    </div>
+  ) : null;

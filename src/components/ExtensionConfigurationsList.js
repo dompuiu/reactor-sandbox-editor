@@ -1,7 +1,7 @@
 import React from 'react';
-import List from './List';
 import { withRouter } from 'react-router-dom';
 import { connect } from 'react-redux';
+import List from './List';
 
 const ExtensionConfigurationsList = ({
   extensionConfigurations,
@@ -27,5 +27,8 @@ const mapDispatch = ({
 });
 
 export default withRouter(
-  connect(mapState, mapDispatch)(ExtensionConfigurationsList)
+  connect(
+    mapState,
+    mapDispatch
+  )(ExtensionConfigurationsList)
 );

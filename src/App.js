@@ -1,10 +1,9 @@
 import React, { Component } from 'react';
-import { init } from '@rematch/core';
 import { Provider } from 'react-redux';
 import { HashRouter as Router, Switch } from 'react-router-dom';
-import { dispatch } from '@rematch/core';
 import { LastLocationProvider } from 'react-router-last-location';
 
+import store, { dispatch } from './store';
 import PreloaderRoute from './components/PreloaderRoute';
 import Main from './components/Main';
 import Settings from './components/Settings';
@@ -16,32 +15,6 @@ import DataElementsList from './components/DataElementsList';
 import DataElementEdit from './components/DataElementEdit';
 import ExtensionConfigurationsList from './components/ExtensionConfigurationsList';
 import ExtensionConfigurationEdit from './components/ExtensionConfigurationEdit';
-
-import registry from './models/registry';
-import currentIframe from './models/currentIframe';
-import currentRule from './models/currentRule';
-import rules from './models/rules';
-import dataElements from './models/dataElements';
-import propertySettings from './models/propertySettings';
-import otherSettings from './models/otherSettings';
-import extensionConfigurations from './models/extensionConfigurations';
-import brain from './models/brain';
-import modals from './models/modals';
-
-const store = init({
-  models: {
-    brain: brain,
-    rules: rules,
-    dataElements: dataElements,
-    extensionConfigurations: extensionConfigurations,
-    registry: registry,
-    currentIframe: currentIframe,
-    currentRule: currentRule,
-    propertySettings: propertySettings,
-    otherSettings: otherSettings,
-    modals: modals
-  }
-});
 
 dispatch({ type: 'brain/initialize' });
 

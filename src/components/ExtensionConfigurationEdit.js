@@ -4,57 +4,110 @@ import { connect } from 'react-redux';
 import { Map, List } from 'immutable';
 import './ComponentEditSidebar.css';
 import ComponentIframe from './ComponentIframe';
+import Backdrop from './Backdrop';
 
-const isNewComponent = props => {
-  const extensionConfigurationId =
-    props.match.params.extension_configuration_id;
+const isNewExtensionConfiguration = ({
+  extensionConfigurations,
+  match: {
+    params: { extension_configuration_id: extensionConfigurationId }
+  }
+}) =>
+  extensionConfigurationId === 'new' ||
+  extensionConfigurationId >= (extensionConfigurations || List()).size;
 
-  return (
-    extensionConfigurationId === 'new' ||
-    extensionConfigurationId >= (props.extensionConfigurations || List()).size
-  );
-};
-
-const getExtensionConfiguration = props => {
-  const extensionConfigurationId =
-    props.match.params.extension_configuration_id;
-  return (
-    (props.extensionConfigurations || List()).get(extensionConfigurationId) ||
-    Map({
-      name: '',
-      settings: null
-    })
-  );
-};
+const getExtensionConfiguration = ({
+  extensionConfigurations,
+  match: {
+    params: { extension_configuration_id: extensionConfigurationId }
+  }
+}) =>
+  (extensionConfigurations || List()).get(extensionConfigurationId) ||
+  Map({
+    name: '',
+    settings: null
+  });
 
 class ExtensionConfigurationEdit extends Component {
+  static backLink() {
+    return '/extension_configurations/';
+  }
+
   constructor(props) {
     super(props);
 
     this.state = {
+      waitingForExtensionResponse: false,
+      extensionConfiguration: getExtensionConfiguration(props),
       errors: {}
     };
   }
 
-  static getDerivedStateFromProps(nextProps, prevState) {
-    return prevState.extensionConfiguration
-      ? prevState
-      : {
-        extensionConfiguration: getExtensionConfiguration(nextProps)
-      };
-  }
+  handleNameChange = event => {
+    const { extensionConfiguration } = this.state;
 
-  handleNameChange(event) {
     this.setState({
-      extensionConfiguration: this.state.extensionConfiguration.merge({
+      extensionConfiguration: extensionConfiguration.merge({
         settings: null,
         name: event.target.value
       })
     });
-  }
+  };
+
+  handleSave = () => {
+    if (!this.isValid()) {
+      return false;
+    }
+
+    const {
+      addExtensionConfiguration,
+      saveExtensionConfiguration,
+      currentIframe,
+      history,
+      registry,
+      match: { params }
+    } = this.props;
+
+    const { extensionConfiguration } = this.state;
+    const method = isNewExtensionConfiguration(this.props)
+      ? addExtensionConfiguration
+      : saveExtensionConfiguration;
+
+    const displayName = registry.getIn([
+      'extensions',
+      extensionConfiguration.get('name'),
+      'displayName'
+    ]);
+
+    this.setState({
+      waitingForExtensionResponse: true
+    });
+
+    currentIframe.promise
+      .then(api => Promise.all([api.validate(), api.getSettings()]))
+      .then(([isValid, settings]) => {
+        if (isValid) {
+          method({
+            id: params.extension_configuration_id,
+            extensionConfiguration: extensionConfiguration.merge({
+              displayName,
+              settings
+            })
+          });
+
+          history.push(this.constructor.backLink());
+        } else {
+          this.setState({
+            waitingForExtensionResponse: false
+          });
+        }
+      });
+
+    return true;
+  };
 
   extensionConfigurationList() {
-    return (this.props.registry.get('extensions') || List())
+    const { registry } = this.props;
+    return (registry.get('extensions') || List())
       .filter(i => i.get('viewPath'))
       .valueSeq()
       .map(v => (
@@ -67,91 +120,66 @@ class ExtensionConfigurationEdit extends Component {
       ));
   }
 
-  backLink() {
-    return '/extension_configurations/';
-  }
-
   isValid() {
     const errors = {};
+    const { extensionConfiguration } = this.state;
 
-    if (!this.state.extensionConfiguration.get('name')) {
+    if (!extensionConfiguration.get('name')) {
       errors.name = true;
     }
 
-    this.setState({ errors: errors });
+    this.setState({ errors });
     return Object.keys(errors).length === 0;
   }
 
-  handleSave(event) {
-    if (!this.isValid()) {
-      return false;
-    }
-
-    const params = this.props.match.params;
-    const method = isNewComponent(this.props)
-      ? 'addExtensionConfiguration'
-      : 'saveExtensionConfiguration';
-
-    const displayName = this.props.registry.getIn([
-      'extensions',
-      this.state.extensionConfiguration.get('name'),
-      'displayName'
-    ]);
-
-    this.props.currentIframe.promise
-      .then(api => Promise.all([api.validate(), api.getSettings()]))
-      .then(([isValid, settings]) => {
-        if (isValid) {
-          this.props[method]({
-            id: params.extension_configuration_id,
-            extensionConfiguration: this.state.extensionConfiguration.merge({
-              displayName: displayName,
-              settings: settings
-            })
-          });
-
-          this.props.history.push(this.backLink());
-        }
-      });
-  }
-
   render() {
-    const props = this.props;
+    const { registry } = this.props;
+    const {
+      errors,
+      extensionConfiguration,
+      waitingForExtensionResponse
+    } = this.state;
 
-    const componentIframeDetails = props.registry.getIn([
+    const componentIframeDetails = registry.getIn([
       'extensions',
-      this.state.extensionConfiguration.get('name')
+      extensionConfiguration.get('name')
     ]);
 
     return (
       <div className="pure-g component-edit-container">
+        {waitingForExtensionResponse ? (
+          <Backdrop message="Waiting for the extension response..." />
+        ) : null}
         <div className="pure-u-1-4">
           <div className="component-edit-sidebar">
             <form className="pure-form pure-form-stacked">
               <fieldset>
                 <h4>Extension Configuration Name</h4>
-                <label htmlFor="extensionConfigurationName">Name</label>
-                <select
-                  id="extensionConfigurationName"
-                  className={this.state.errors.name ? 'border-error' : ''}
-                  value={this.state.extensionConfiguration.get('name')}
-                  onChange={this.handleNameChange.bind(this)}
-                >
-                  <option value="">Please select...</option>
-                  {this.extensionConfigurationList()}
-                </select>
+                <label htmlFor="extensionConfigurationName">
+                  <span>Name</span>
+                  <select
+                    id="extensionConfigurationName"
+                    className={errors.name ? 'border-error' : ''}
+                    value={extensionConfiguration.get('name')}
+                    onChange={this.handleNameChange}
+                  >
+                    <option value="">Please select...</option>
+                    {this.extensionConfigurationList()}
+                  </select>
+                </label>
               </fieldset>
             </form>
 
             <div className="button-container">
               <button
+                type="button"
                 className="pure-button-primary pure-button"
-                onClick={this.handleSave.bind(this)}
+                onClick={this.handleSave}
               >
                 Save
               </button>
               &nbsp;
-              <Link to={this.backLink()} className="pure-button">
+              <Link to={this.constructor.backLink()} className="pure-button">
                 Cancel
               </Link>
             </div>
@@ -160,8 +188,8 @@ class ExtensionConfigurationEdit extends Component {
         <div className="pure-u-3-4">
           <ComponentIframe
             component={componentIframeDetails}
-            settings={this.state.extensionConfiguration.get('settings')}
-            server={props.registry.getIn(['environment', 'server'])}
+            settings={extensionConfiguration.get('settings')}
+            server={registry.getIn(['environment', 'server'])}
           />
         </div>
       </div>
@@ -188,5 +216,8 @@ const mapDispatch = ({
 });
 
 export default withRouter(
-  connect(mapState, mapDispatch)(ExtensionConfigurationEdit)
+  connect(
+    mapState,
+    mapDispatch
+  )(ExtensionConfigurationEdit)
 );

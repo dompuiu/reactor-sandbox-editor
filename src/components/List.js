@@ -2,14 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import './List.css';
 
-const List = ({
-  items,
-  nameProperty,
-  deleteFn,
-  className,
-  addLink,
-  linkPrefix
-}) => (
+const List = ({ items, nameProperty, deleteFn, className, linkPrefix }) => (
   <div className={`list-container ${className}`}>
     <table className="pure-table list-table">
       <thead>
@@ -20,7 +13,7 @@ const List = ({
       </thead>
       <tbody>
         {items.map((item, i) => (
-          <tr key={`List${i}`}>
+          <tr key={item}>
             <td className="list-item-name">{item.get(nameProperty)}</td>
             <td className="list-item-actions">
               <Link
@@ -30,7 +23,11 @@ const List = ({
                 Edit
               </Link>
               &nbsp;
-              <button onClick={deleteFn.bind(this, i)} className="pure-button">
+              <button
+                type="button"
+                onClick={deleteFn.bind(this, i)}
+                className="pure-button"
+              >
                 Delete
               </button>
             </td>

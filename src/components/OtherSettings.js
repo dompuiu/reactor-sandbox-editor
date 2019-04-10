@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import { Map } from 'immutable';
 import { withRouter } from 'react-router-dom';
 import { connect } from 'react-redux';
 import './OtherSettings.css';
@@ -9,62 +8,66 @@ class OtherSettings extends Component {
     super(props);
 
     this.state = {
-      otherSettings: Map({
-        company: {
-          orgId: ''
-        }
-      }),
+      otherSettings: props.otherSettings,
       errors: {}
     };
   }
 
-  static getDerivedStateFromProps(nextProps, prevState) {
-    return nextProps;
-  }
+  handleOrgIdChange = event => {
+    const { otherSettings } = this.state;
 
-  handleOrgIdChange(event) {
     this.setState({
-      otherSettings: this.state.otherSettings.setIn(
+      otherSettings: otherSettings.setIn(
         ['company', 'orgId'],
         event.target.value
       )
     });
-  }
+  };
 
-  handleImsChange(event) {
+  handleImsChange = event => {
+    const { otherSettings } = this.state;
+
     this.setState({
-      otherSettings: this.state.otherSettings.setIn(
+      otherSettings: otherSettings.setIn(
         ['tokens', 'imsAccess'],
         event.target.value
       )
     });
-  }
+  };
 
-  isValid() {
-    const errors = {};
+  handleSave = () => {
+    const { history, setOtherSettings } = this.props;
+    const { otherSettings } = this.state;
 
-    if (!this.state.otherSettings.getIn(['company', 'orgId'])) {
-      errors.orgId = true;
-    }
-
-    if (!this.state.otherSettings.getIn(['tokens', 'imsAccess'])) {
-      errors.imsAccess = true;
-    }
-
-    this.setState({ errors: errors });
-    return Object.keys(errors).length === 0;
-  }
-
-  handleSave(event) {
     if (!this.isValid()) {
       return false;
     }
 
-    this.props.setOtherSettings(this.state.otherSettings);
-    this.props.history.push('/');
+    setOtherSettings(otherSettings);
+    history.push('/');
+
+    return true;
+  };
+
+  isValid() {
+    const errors = {};
+    const { otherSettings } = this.state;
+
+    if (!otherSettings.getIn(['company', 'orgId'])) {
+      errors.orgId = true;
+    }
+
+    if (!otherSettings.getIn(['tokens', 'imsAccess'])) {
+      errors.imsAccess = true;
+    }
+
+    this.setState({ errors });
+    return Object.keys(errors).length === 0;
   }
 
   render() {
+    const { errors, otherSettings } = this.state;
+
     return (
       <div className="other-settings-container">
         <form className="pure-form pure-form-aligned">
@@ -74,14 +77,12 @@ class OtherSettings extends Component {
               <label htmlFor="orgId">Organization ID</label>
               <input
                 className={`pure-input-2-3 ${
-                  this.state.errors.orgId ? 'border-error' : ''
+                  errors.orgId ? 'border-error' : ''
                 }`}
                 id="orgId"
                 type="text"
-                value={
-                  this.state.otherSettings.getIn(['company', 'orgId']) || ''
-                }
-                onChange={this.handleOrgIdChange.bind(this)}
+                value={otherSettings.getIn(['company', 'orgId']) || ''}
+                onChange={this.handleOrgIdChange}
               />
             </div>
           </fieldset>
@@ -92,23 +93,22 @@ class OtherSettings extends Component {
               <label htmlFor="imsAccess">IMS Token</label>
               <input
                 className={`pure-input-2-3 ${
-                  this.state.errors.imsAccess ? 'border-error' : ''
+                  errors.imsAccess ? 'border-error' : ''
                 }`}
                 id="imsAccess"
                 type="text"
-                value={
-                  this.state.otherSettings.getIn(['tokens', 'imsAccess']) || ''
-                }
-                onChange={this.handleImsChange.bind(this)}
+                value={otherSettings.getIn(['tokens', 'imsAccess']) || ''}
+                onChange={this.handleImsChange}
               />
             </div>
             <div className="pure-controls">
-              <a
+              <button
+                type="button"
                 className="pure-button pure-button-primary"
-                onClick={this.handleSave.bind(this)}
+                onClick={this.handleSave}
               >
                 Save
-              </a>
+              </button>
             </div>
           </fieldset>
         </form>

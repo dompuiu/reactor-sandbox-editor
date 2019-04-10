@@ -1,7 +1,7 @@
 import React from 'react';
-import List from './List';
 import { withRouter } from 'react-router-dom';
 import { connect } from 'react-redux';
+import List from './List';
 
 const DataElementsList = ({ dataElements, deleteDataElement }) => (
   <List
@@ -21,4 +21,9 @@ const mapDispatch = ({ dataElements: { deleteDataElement } }) => ({
   deleteDataElement: i => deleteDataElement(i)
 });
 
-export default withRouter(connect(mapState, mapDispatch)(DataElementsList));
+export default withRouter(
+  connect(
+    mapState,
+    mapDispatch
+  )(DataElementsList)
+);

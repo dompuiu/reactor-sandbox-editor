@@ -1,7 +1,7 @@
 import React from 'react';
+import { withRouter } from 'react-router-dom';
 import './RuleComponentsList.css';
 import RuleComponentCard from './RuleComponentCard';
-import { withRouter } from 'react-router-dom';
 
 const handleOnClick = (type, match, history) => {
   history.push(`/rules/${match.params.rule_id}/${type}/new`);
@@ -18,7 +18,7 @@ const RuleComponentsList = ({
     <div className="rule-components-list">
       {items.map((item, i) => (
         <RuleComponentCard
-          key={`RuleComponentCard${i}`}
+          key={item}
           item={item}
           type={type}
           index={i}
@@ -28,6 +28,7 @@ const RuleComponentsList = ({
     </div>
 
     <button
+      type="button"
       onClick={handleOnClick.bind(this, type, match, history)}
       className="add-button pure-button pure-button-primary"
     >

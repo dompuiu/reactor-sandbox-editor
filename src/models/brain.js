@@ -1,7 +1,7 @@
 import { fromJS, Map } from 'immutable';
 import environment from './environment';
 import localStorage from './localStorage';
-import { dispatch } from '@rematch/core';
+import { dispatch } from '../store';
 
 export default {
   state: Map(), // initial state
@@ -48,7 +48,7 @@ export default {
 
       if (response.ok) {
         const containerData = await response.json();
-        this.pushDataDown(containerData);
+        this.pushDataDown(Map(containerData));
         this.setContainerDataLoaded('success');
       } else {
         this.setContainerDataLoaded('failed');

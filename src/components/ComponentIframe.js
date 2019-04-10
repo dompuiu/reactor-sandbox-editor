@@ -1,14 +1,10 @@
 import React, { Component } from 'react';
-import ReactDOM from 'react-dom';
 import { connect } from 'react-redux';
-import { loadIframe, setPromise } from '@adobe/reactor-bridge';
+import { loadIframe } from '@adobe/reactor-bridge';
 import './ComponentIframe.css';
-
-setPromise(Promise);
 
 class ComponentIframe extends Component {
   componentDidMount() {
-    this.dom = ReactDOM.findDOMNode(this);
     this.renderIframe();
   }
 
@@ -18,13 +14,15 @@ class ComponentIframe extends Component {
   }
 
   getUrl() {
-    if (!this.props.component) {
+    const { component, server } = this.props;
+
+    if (!component) {
       return '';
     }
 
-    const host = this.props.server.get('host');
-    const port = this.props.server.get('port');
-    let path = this.props.component.get('viewPath');
+    const host = server.get('host');
+    const port = server.get('port');
+    let path = component.get('viewPath');
 
     if (!path) {
       path = 'noConfigIframe.html';
@@ -35,30 +33,37 @@ class ComponentIframe extends Component {
 
   renderIframe() {
     const url = this.getUrl();
-    const openCodeEditorModal = this.props.openCodeEditorModal;
-    const openDataElementSelectorModal = this.props
-      .openDataElementSelectorModal;
+    const {
+      openCodeEditorModal,
+      openDataElementSelectorModal,
+      settings,
+      otherSettings,
+      propertySettings,
+      extensionConfiguration,
+      setCurrentIframe
+    } = this.props;
+
     if (!url) {
       return;
     }
 
     const extensionInitOptions = {
-      settings: this.props.settings && this.props.settings.toJS(),
-      company: this.props.otherSettings.get('company').toJS(),
-      propertySettings: this.props.propertySettings.toJS(),
-      tokens: this.props.otherSettings.get('tokens').toJS()
+      settings: settings && settings.toJS(),
+      company: otherSettings.get('company').toJS(),
+      propertySettings: propertySettings.toJS(),
+      tokens: otherSettings.get('tokens').toJS()
     };
 
-    if (this.props.extensionConfiguration) {
-      extensionInitOptions.extensionSettings = this.props.extensionConfiguration
+    if (extensionConfiguration) {
+      extensionInitOptions.extensionSettings = extensionConfiguration
         .get('settings')
         .toJS();
     }
 
     const iframeApi = loadIframe({
-      url: url,
+      url,
       container: this.dom,
-      extensionInitOptions: extensionInitOptions,
+      extensionInitOptions,
       connectionTimeoutDuration: 30000,
       openCodeEditor(options = {}) {
         return new Promise((resolve, reject) => {
@@ -67,25 +72,32 @@ class ComponentIframe extends Component {
             onSave: resolve,
             onClose: reject
           });
-        });
+        }).catch(() => {});
       },
-      openRegexTester(options = {}) {},
-      openDataElementSelector(options = {}) {
+      openRegexTester() {},
+      openDataElementSelector() {
         return new Promise((resolve, reject) => {
           openDataElementSelectorModal({
             onSave: resolve,
             onClose: reject
           });
-        });
+        }).catch(() => '');
       },
       markAsDirty() {}
     });
 
-    this.props.setCurrentIframe(iframeApi);
+    setCurrentIframe(iframeApi);
   }
 
   render() {
-    return <div className="component-iframe" />;
+    return (
+      <div
+        ref={node => {
+          this.dom = node;
+        }}
+        className="component-iframe"
+      />
+    );
   }
 }
 

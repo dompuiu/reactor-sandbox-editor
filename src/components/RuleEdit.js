@@ -6,9 +6,13 @@ import { List, Map } from 'immutable';
 import { withLastLocation } from 'react-router-last-location';
 import RuleComponentsList from './RuleComponentsList';
 
-const isNewRule = props => {
-  const ruleId = props.match.params.rule_id;
-  return ruleId === 'new' || !props.rules || ruleId >= props.rules.size;
+const isNewRule = ({
+  match: {
+    params: { rule_id: ruleId }
+  },
+  rules
+}) => {
+  return ruleId === 'new' || !rules || ruleId >= rules.size;
 };
 
 // Need to check from where the user is coming. If he returns from a rule
@@ -31,11 +35,11 @@ const checkLastLocation = location => {
   );
 };
 
-const currentRule = props => {
+const getCurrentRule = props => {
   const ruleId = props.match.params.rule_id;
   let rule;
 
-  let currentRule = props.currentRule;
+  let { currentRule } = props;
   if (!checkLastLocation(props.lastLocation)) {
     currentRule = null;
   }
@@ -55,122 +59,135 @@ class RuleEdit extends Component {
     super(props);
 
     this.state = {
+      rule: getCurrentRule(props),
       errors: {}
     };
-  }
-
-  static getDerivedStateFromProps(nextProps) {
-    const rule = currentRule(nextProps);
-
-    return {
-      rule: rule,
-      newRule: isNewRule(nextProps)
-    };
-  }
-
-  isValid() {
-    const errors = {};
-
-    if (!this.state.rule.get('name')) {
-      errors.name = true;
-    }
-
-    this.setState({ errors: errors });
-    return Object.keys(errors).length === 0;
   }
 
   componentWillUnmount() {
     locationChecked = false;
   }
 
-  handleSave() {
+  handleSave = () => {
     if (!this.isValid()) {
       return false;
     }
 
-    const ruleId = this.props.match.params.rule_id;
-    const method = this.state.newRule ? 'addRule' : 'saveRule';
+    const {
+      addRule,
+      saveRule,
+      match: {
+        params: { rule_id: ruleId }
+      },
+      setCurrentRule,
+      history
+    } = this.props;
 
-    this.props[method]({
+    const { rule } = this.state;
+    const method = isNewRule(this.props) ? addRule : saveRule;
+
+    method({
       id: ruleId,
-      rule: this.state.rule
+      rule
     });
 
-    this.props.setCurrentRule(null);
-    this.props.history.push('/rules');
-  }
+    setCurrentRule(null);
+    history.push('/rules');
 
-  handleNameChange(event) {
-    const rule = this.state.rule;
+    return true;
+  };
+
+  handleNameChange = event => {
+    const { rule } = this.state;
+    const { setCurrentRule } = this.props;
     const newRule = rule.set('name', event.target.value);
 
-    this.props.setCurrentRule(newRule);
+    setCurrentRule(newRule);
     this.setState({ rule: newRule });
-  }
+  };
 
-  handleCancelClick() {
-    this.props.setCurrentRule(null);
-  }
+  handleCancelClick = () => {
+    const { setCurrentRule } = this.props;
+    setCurrentRule(null);
+  };
 
-  handleDeleteClick(type, index) {
-    const rule = this.state.rule.deleteIn([type, index]);
+  handleDeleteClick = (type, index) => {
+    const { setCurrentRule } = this.props;
+    const { rule } = this.state;
+    const newRule = rule.deleteIn([type, index]);
 
-    this.props.setCurrentRule(rule);
-    this.setState({ rule: rule });
+    setCurrentRule(newRule);
+    this.setState({ rule: newRule });
+  };
+
+  isValid() {
+    const errors = {};
+    const { rule } = this.state;
+
+    if (!rule.get('name')) {
+      errors.name = true;
+    }
+
+    this.setState({ errors });
+    return Object.keys(errors).length === 0;
   }
 
   render() {
+    const { rule, errors } = this.state;
     return (
       <div className="pure-g container">
         <div className="pure-u-1-1">
           <form className="pure-form">
             <fieldset>
               <legend>
-                <strong>{this.state.newRule ? 'Create' : 'Edit'} Rule</strong>
+                <strong>
+                  {isNewRule(this.props) ? 'Create' : 'Edit'} Rule
+                </strong>
               </legend>
               <input
                 type="text"
-                className={this.state.errors.name ? 'border-error' : ''}
+                className={errors.name ? 'border-error' : ''}
                 placeholder="Rule name"
-                value={this.state.rule.get('name') || ''}
-                onChange={this.handleNameChange.bind(this)}
+                value={rule.get('name') || ''}
+                onChange={this.handleNameChange}
               />
             </fieldset>
           </form>
           <div className="component-group">
             <strong>Events</strong>
             <RuleComponentsList
-              handleDeleteClick={this.handleDeleteClick.bind(this)}
-              items={this.state.rule.get('events') || List()}
+              handleDeleteClick={this.handleDeleteClick}
+              items={rule.get('events') || List()}
               type="events"
             />
           </div>
           <div className="component-group">
             <strong>Conditions</strong>
             <RuleComponentsList
-              handleDeleteClick={this.handleDeleteClick.bind(this)}
-              items={this.state.rule.get('conditions') || List()}
+              handleDeleteClick={this.handleDeleteClick}
+              items={rule.get('conditions') || List()}
               type="conditions"
             />
           </div>
           <div className="component-group">
             <strong>Actions</strong>
             <RuleComponentsList
-              handleDeleteClick={this.handleDeleteClick.bind(this)}
-              items={this.state.rule.get('actions') || List()}
+              handleDeleteClick={this.handleDeleteClick}
+              items={rule.get('actions') || List()}
               type="actions"
             />
           </div>
           <div className="button-container">
             <button
-              onClick={this.handleSave.bind(this)}
+              type="button"
+              onClick={this.handleSave}
               className="pure-button-primary pure-button"
             >
               Save
             </button>
             &nbsp;
             <Link
-              onClick={this.handleCancelClick.bind(this)}
+              onClick={this.handleCancelClick}
               to="/rules"
               className="pure-button"
             >
@@ -200,5 +217,8 @@ const mapDispatch = ({
 });
 
 export default withRouter(
-  connect(mapState, mapDispatch)(withLastLocation(RuleEdit))
+  connect(
+    mapState,
+    mapDispatch
+  )(withLastLocation(RuleEdit))
 );

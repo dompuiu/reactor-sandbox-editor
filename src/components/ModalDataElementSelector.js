@@ -10,51 +10,59 @@ class ModalDataElementSelectorEditor extends Component {
     super(props);
 
     this.state = {
-      dataElementSelectorModal: Map()
+      dataElementSelectorModal: Map(),
+      prevModalSize: props.modals.size
     };
   }
 
   static getDerivedStateFromProps(nextProps, prevState) {
-    if (nextProps.modals.size === 0) {
+    if (nextProps.modals.size !== prevState.prevModalSize) {
       return {
-        dataElementSelectorModal: Map()
+        prevModalSize: nextProps.modals.size,
+        dataElementSelectorModal: nextProps.modals.getIn([
+          'dataElementSelectorModal'
+        ])
       };
     }
 
-    return {
-      dataElementSelectorModal: nextProps.modals.getIn([
-        'dataElementSelectorModal'
-      ])
-    };
+    return null;
   }
 
-  handleOnSave() {
+  handleOnSave = () => {
+    const { dataElementSelectorModal } = this.state;
+    const { closeDataElementSelectorModal } = this.props;
+
     let newDataElement = '';
-    if (this.state.dataElementSelectorModal.get('dataElement')) {
-      newDataElement =
-        '%' + this.state.dataElementSelectorModal.get('dataElement') + '%';
+    if (dataElementSelectorModal.get('dataElement')) {
+      newDataElement = `%${dataElementSelectorModal.get('dataElement')}%`;
     }
 
-    this.state.dataElementSelectorModal.get('onSave')(newDataElement);
-    this.props.closeDataElementSelectorModal();
-  }
+    dataElementSelectorModal.get('onSave')(newDataElement);
+    closeDataElementSelectorModal();
+  };
 
-  handleOnClose() {
-    this.state.dataElementSelectorModal.get('onClose')();
-    this.props.closeDataElementSelectorModal();
-  }
+  handleOnClose = () => {
+    const { dataElementSelectorModal } = this.state;
+    const { closeDataElementSelectorModal } = this.props;
 
-  handleDataElementChange(event) {
+    dataElementSelectorModal.get('onClose')();
+    closeDataElementSelectorModal();
+  };
+
+  handleDataElementChange = event => {
+    const { dataElementSelectorModal } = this.state;
+
     this.setState({
-      dataElementSelectorModal: this.state.dataElementSelectorModal.set(
+      dataElementSelectorModal: dataElementSelectorModal.set(
         'dataElement',
         event.target.value
       )
     });
-  }
+  };
 
   dataElementList() {
-    return (this.props.dataElements || List()).valueSeq().map(v => (
+    const { dataElements } = this.props;
+    return (dataElements || List()).valueSeq().map(v => (
       <option
         value={v.get('name')}
         key={`extensionConfiguration${v.get('name')}`}
@@ -65,29 +73,26 @@ class ModalDataElementSelectorEditor extends Component {
   }
 
   render() {
-    const dataElementSelectorModal = this.state.dataElementSelectorModal;
-    if (!dataElementSelectorModal) {
-      return null;
-    }
+    const { dataElementSelectorModal } = this.state;
 
-    return (
-      <div className="modal-data-element-selector">
+    return dataElementSelectorModal ? (
+      <div className="modal-data-element-selector pure-form">
         <Modal
           title="Data Element Selector"
           show={dataElementSelectorModal.get('open')}
-          onSave={this.handleOnSave.bind(this)}
-          onClose={this.handleOnClose.bind(this)}
+          onSave={this.handleOnSave}
+          onClose={this.handleOnClose}
         >
           <select
             value={dataElementSelectorModal.get('dataElement')}
-            onChange={this.handleDataElementChange.bind(this)}
+            onChange={this.handleDataElementChange}
           >
             <option>Please select...</option>
             {this.dataElementList()}
           </select>
         </Modal>
       </div>
-    );
+    ) : null;
   }
 }
 
@@ -102,5 +107,8 @@ const mapDispatch = ({ modals: { closeDataElementSelectorModal } }) => ({
 });
 
 export default withRouter(
-  connect(mapState, mapDispatch)(ModalDataElementSelectorEditor)
+  connect(
+    mapState,
+    mapDispatch
+  )(ModalDataElementSelectorEditor)
 );

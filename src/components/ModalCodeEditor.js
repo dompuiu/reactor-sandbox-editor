@@ -10,62 +10,66 @@ class ModalCodeEditor extends Component {
     super(props);
 
     this.state = {
-      codeEditorModal: Map()
+      codeEditorModal: Map(),
+      prevModalSize: props.modals.size
     };
   }
 
   static getDerivedStateFromProps(nextProps, prevState) {
-    if (nextProps.modals.size === 0) {
+    if (nextProps.modals.size !== prevState.prevModalSize) {
       return {
-        codeEditorModal: Map()
+        prevModalSize: nextProps.modals.size,
+        codeEditorModal: nextProps.modals.getIn(['codeEditorModal'])
       };
     }
 
-    return { codeEditorModal: nextProps.modals.getIn(['codeEditorModal']) };
+    return null;
   }
 
-  handleOnSave() {
-    this.state.codeEditorModal.get('onSave')(
-      this.state.codeEditorModal.get('code')
-    );
-    this.props.closeCodeEditorModal();
-  }
+  handleOnSave = () => {
+    const { codeEditorModal } = this.state;
+    const { closeCodeEditorModal } = this.props;
 
-  handleOnClose() {
-    this.state.codeEditorModal.get('onClose')();
-    this.props.closeCodeEditorModal();
-  }
+    codeEditorModal.get('onSave')(codeEditorModal.get('code'));
+    closeCodeEditorModal();
+  };
 
-  handleCodeChange(event) {
+  handleOnClose = () => {
+    const { codeEditorModal } = this.state;
+    const { closeCodeEditorModal } = this.props;
+
+    codeEditorModal.get('onClose')();
+    closeCodeEditorModal();
+  };
+
+  handleCodeChange = event => {
+    const { codeEditorModal } = this.state;
+
     this.setState({
-      codeEditorModal: this.state.codeEditorModal.set(
-        'code',
-        event.target.value
-      )
+      codeEditorModal: codeEditorModal.set('code', event.target.value)
     });
-  }
+  };
 
   render() {
-    const codeEditorModal = this.state.codeEditorModal;
-    if (!codeEditorModal) {
-      return null;
-    }
+    const { codeEditorModal } = this.state;
 
-    return (
+    return codeEditorModal ? (
       <div className="modal-code-editor">
         <Modal
           title="Code Editor"
           show={codeEditorModal.get('open')}
-          onSave={this.handleOnSave.bind(this)}
-          onClose={this.handleOnClose.bind(this)}
+          onSave={this.handleOnSave}
+          onClose={this.handleOnClose}
         >
-          <textarea
-            value={codeEditorModal.get('code')}
-            onChange={this.handleCodeChange.bind(this)}
-          />
+          <div className="pure-form">
+            <textarea
+              value={codeEditorModal.get('code')}
+              onChange={this.handleCodeChange}
+            />
+          </div>
         </Modal>
       </div>
-    );
+    ) : null;
   }
 }
 
@@ -77,4 +81,9 @@ const mapDispatch = ({ modals: { closeCodeEditorModal } }) => ({
   closeCodeEditorModal: payload => closeCodeEditorModal(payload)
 });
 
-export default withRouter(connect(mapState, mapDispatch)(ModalCodeEditor));
+export default withRouter(
+  connect(
+    mapState,
+    mapDispatch
+  )(ModalCodeEditor)
+);

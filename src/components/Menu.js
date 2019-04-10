@@ -3,17 +3,14 @@ import { connect } from 'react-redux';
 import { Link, withRouter } from 'react-router-dom';
 import './Menu.css';
 
-const isSavedEnabled = match => {
-  return (
-    [
-      '/',
-      '/extension_configurations',
-      '/data_elements',
-      '/rules',
-      '/property_settings'
-    ].indexOf(match.path) !== -1
-  );
-};
+const isSavedEnabled = match =>
+  [
+    '/',
+    '/extension_configurations',
+    '/data_elements',
+    '/rules',
+    '/property_settings'
+  ].indexOf(match.path) !== -1;
 
 const Menu = ({ match, save }) => (
   <div className="main-menu">
@@ -47,7 +44,7 @@ const Menu = ({ match, save }) => (
           <Link
             to="/rules"
             className={`pure-menu-link ${
-              match.path === '/rules' ? 'menu-selected' : ''
+              match.path.includes('/rules') ? 'menu-selected' : ''
             }`}
           >
             Rules
@@ -75,9 +72,9 @@ const Menu = ({ match, save }) => (
         </li>
         {isSavedEnabled(match) ? (
           <li className="pure-menu-item">
-            <a className="pure-menu-link" onClick={save}>
+            <button type="button" className="pure-menu-link" onClick={save}>
               Save and Exit
-            </a>
+            </button>
           </li>
         ) : null}
       </ul>
@@ -85,7 +82,7 @@ const Menu = ({ match, save }) => (
   </div>
 );
 
-const mapState = state => ({});
+const mapState = () => ({});
 const mapDispatch = ({ brain: { save } }) => ({
   save: () => save()
 });

@@ -4,36 +4,32 @@ import { connect } from 'react-redux';
 import { Map, List } from 'immutable';
 import './ComponentEditSidebar.css';
 import ComponentIframe from './ComponentIframe';
+import Backdrop from './Backdrop';
 
-const isNewComponent = props => {
-  const componentId = props.match.params.component_id;
-  const type = props.match.params.type;
+const isNewComponent = (componentId, type, currentRule) =>
+  componentId === 'new' ||
+  componentId >= (currentRule.get(type) || List()).size;
 
-  return (
-    componentId === 'new' ||
-    !props.currentRule ||
-    componentId >= (props.currentRule.get(type) || List()).size
-  );
-};
-
-const currentRule = props => {
-  const ruleId = props.match.params.rule_id;
+const getCurrentRule = (currentRule, rules, ruleId) => {
   let rule;
 
-  if (props.currentRule && props.currentRule.get('id') === ruleId) {
-    rule = props.currentRule;
+  if (currentRule && currentRule.get('id') === ruleId) {
+    rule = currentRule;
   } else {
-    rule = (props.rules || List()).get(ruleId) || Map();
+    rule = (rules || List()).get(ruleId) || Map();
   }
   rule = rule.set('id', ruleId);
   return rule;
 };
 
-const getComponent = props => {
-  const type = props.match.params.type;
-  const componentId = props.match.params.component_id;
-
-  const rule = currentRule(props);
+const getComponent = ({
+  match: {
+    params: { type, component_id: componentId, rule_id: ruleId }
+  },
+  rules,
+  currentRule
+}) => {
+  const rule = getCurrentRule(currentRule, rules, ruleId);
   return (
     rule.getIn([type, componentId]) ||
     Map({
@@ -47,85 +43,114 @@ class RuleComponentEdit extends Component {
   constructor(props) {
     super(props);
 
+    const currentRule = getCurrentRule(
+      props.currentRule,
+      props.rules,
+      props.match.params.rule_id
+    );
+
     this.state = {
-      errors: {}
+      errors: {},
+      waitingForExtensionResponse: false,
+      component: getComponent(props),
+      currentRule
     };
+
+    props.setCurrentRule(currentRule);
   }
 
-  static getDerivedStateFromProps(nextProps, prevState) {
-    nextProps.setCurrentRule(currentRule(nextProps));
+  handleComponentTypeChange = event => {
+    const { component } = this.state;
 
-    return prevState.component
-      ? prevState
-      : {
-          component: getComponent(nextProps)
-        };
-  }
-
-  handleComponentTypeChange(event) {
     this.setState({
-      component: this.state.component.merge({
+      component: component.merge({
         settings: null,
         modulePath: event.target.value
       })
     });
-  }
+  };
 
-  handleInputChange(fieldName, event) {
-    const component = this.state.component;
-    const target = event.target;
-    const value = target.type === 'checkbox' ? target.checked : target.value;
-    const newComponent = component.set(fieldName, value);
+  handleOrderChange = event => {
+    const { component } = this.state;
+    const {
+      target: { value }
+    } = event;
 
+    const newComponent = component.set('order', value);
     this.setState({ component: newComponent });
-  }
+  };
 
-  handleSave(event) {
+  handleSave = () => {
     if (!this.isValid()) {
       return false;
     }
 
-    const params = this.props.match.params;
+    const { component } = this.state;
 
-    const method = isNewComponent(this.props)
-      ? 'addComponent'
-      : 'saveComponent';
+    const {
+      addComponent,
+      saveComponent,
+      match: {
+        params: { component_id: componentId, type }
+      },
+      currentIframe,
+      history
+    } = this.props;
 
-    this.props.currentIframe.promise
+    const { currentRule } = this.state;
+
+    const method = isNewComponent(componentId, type, currentRule)
+      ? addComponent
+      : saveComponent;
+
+    this.setState({
+      waitingForExtensionResponse: true
+    });
+
+    currentIframe.promise
       .then(api => Promise.all([api.validate(), api.getSettings()]))
       .then(([isValid, settings]) => {
         if (isValid) {
-          this.props[method]({
-            id: params.component_id,
-            type: params.type,
-            component: this.state.component.merge({ settings: settings })
+          method({
+            id: componentId,
+            type,
+            component: component.merge({ settings })
           });
 
-          this.props.history.push(this.backLink());
+          history.push(this.backLink());
+        } else {
+          this.setState({
+            waitingForExtensionResponse: false
+          });
         }
       });
-  }
+
+    return true;
+  };
 
   componentList() {
-    const type = this.props.match.params.type;
+    const {
+      match: {
+        params: { type }
+      },
+      registry
+    } = this.props;
     const componentList = {};
     const groupList = [];
 
-    (this.props.registry.getIn(['components', type]) || List())
-      .valueSeq()
-      .forEach(v => {
-        if (!componentList[v.get('extensionDisplayName')]) {
-          componentList[v.get('extensionDisplayName')] = [];
-        }
-        componentList[v.get('extensionDisplayName')].push(
-          <option
-            value={`${v.get('extensionName')}/${v.get('libPath')}`}
-            key={`optionType${v.get('libPath')}`}
-          >
-            {v.get('displayName')}
-          </option>
-        );
-      });
+    (registry.getIn(['components', type]) || List()).valueSeq().forEach(v => {
+      if (!componentList[v.get('extensionDisplayName')]) {
+        componentList[v.get('extensionDisplayName')] = [];
+      }
+      componentList[v.get('extensionDisplayName')].push(
+        <option
+          value={`${v.get('extensionName')}/${v.get('libPath')}`}
+          key={`optionType${v.get('libPath')}`}
+        >
+          {v.get('displayName')}
+        </option>
+      );
+    });
 
     Object.keys(componentList).forEach(extenisonDisplayName => {
       groupList.push(
@@ -143,63 +168,85 @@ class RuleComponentEdit extends Component {
 
   isValid() {
     const errors = {};
+    const { component } = this.state;
 
-    if (!this.state.component.get('modulePath')) {
+    if (!component.get('modulePath')) {
       errors.modulePath = true;
     }
 
-    this.setState({ errors: errors });
+    this.setState({ errors });
     return Object.keys(errors).length === 0;
   }
 
   backLink() {
-    const ruleId = this.props.match.params.rule_id;
+    const {
+      match: {
+        params: { rule_id: ruleId }
+      }
+    } = this.props;
+
     return `/rules/${ruleId}`;
   }
 
   render() {
-    const props = this.props;
+    const { waitingForExtensionResponse, component, errors } = this.state;
+    const {
+      match: {
+        params: { type }
+      },
+      registry,
+      extensionConfigurations
+    } = this.props;
 
-    const componentIframeDetails = props.registry.getIn([
+    const componentIframeDetails = registry.getIn([
       'components',
-      props.match.params.type,
-      this.state.component.get('modulePath')
+      type,
+      component.get('modulePath')
     ]);
 
-    const extensionName = this.state.component.get('modulePath').split('/')[0];
+    const extensionName = component.get('modulePath').split('/')[0];
 
     return (
       <div className="pure-g component-edit-container">
+        {waitingForExtensionResponse ? (
+          <Backdrop message="Waiting for the extension response..." />
+        ) : null}
         <div className="pure-u-1-4">
           <div className="component-edit-sidebar">
             <form className="pure-form pure-form-stacked">
               <fieldset>
                 <h4>Component Details</h4>
-                <label htmlFor="componentType">Type</label>
-                <select
-                  id="componentType"
-                  className={this.state.errors.modulePath ? 'border-error' : ''}
-                  value={this.state.component.get('modulePath')}
-                  onChange={this.handleComponentTypeChange.bind(this)}
-                >
-                  <option value="">Please select...</option>
-                  {this.componentList()}
-                </select>
+                <label htmlFor="componentType">
+                  <span>Type</span>
+                  <select
+                    id="componentType"
+                    className={errors.modulePath ? 'border-error' : ''}
+                    value={component.get('modulePath')}
+                    onChange={this.handleComponentTypeChange}
+                  >
+                    <option value="">Please select...</option>
+                    {this.componentList()}
+                  </select>
+                </label>
                 <br />
-                <label htmlFor="order">Order</label>
-                <input
-                  id="order"
-                  type="text"
-                  value={this.state.component.get('order') || '50'}
-                  onChange={this.handleInputChange.bind(this, 'order')}
-                />
+
+                <label htmlFor="order">
+                  <span>Order</span>
+                  <input
+                    id="order"
+                    type="text"
+                    value={component.get('order') || '50'}
+                    onChange={this.handleOrderChange}
+                  />
+                </label>
               </fieldset>
             </form>
 
             <div className="button-container">
               <button
+                type="button"
                 className="pure-button-primary pure-button"
-                onClick={this.handleSave.bind(this)}
+                onClick={this.handleSave}
               >
                 Save
               </button>
@@ -213,11 +260,11 @@ class RuleComponentEdit extends Component {
         <div className="pure-u-3-4">
           <ComponentIframe
             component={componentIframeDetails}
-            extensionConfiguration={props.extensionConfigurations
+            extensionConfiguration={extensionConfigurations
               .filter(i => i.get('name') === extensionName)
               .first()}
-            settings={this.state.component.get('settings')}
-            server={props.registry.getIn(['environment', 'server'])}
+            settings={component.get('settings')}
+            server={registry.getIn(['environment', 'server'])}
           />
         </div>
       </div>
@@ -245,4 +292,9 @@ const mapDispatch = ({
   addComponent: payload => addComponent(payload)
 });
 
-export default withRouter(connect(mapState, mapDispatch)(RuleComponentEdit));
+export default withRouter(
+  connect(
+    mapState,
+    mapDispatch
+  )(RuleComponentEdit)
+);

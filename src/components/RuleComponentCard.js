@@ -38,7 +38,8 @@ const RuleComponentCard = ({
       <div title="Edit" className="icono-file" />
     </Link>
 
-    <div
+    <button
+      type="button"
       onClick={handleDeleteClick.bind(this, type, index)}
       title="Delete"
       className="icono-cross"
@@ -54,4 +55,9 @@ const mapState = state => {
 
 const mapDispatch = () => ({});
 
-export default withRouter(connect(mapState, mapDispatch)(RuleComponentCard));
+export default withRouter(
+  connect(
+    mapState,
+    mapDispatch
+  )(RuleComponentCard)
+);
