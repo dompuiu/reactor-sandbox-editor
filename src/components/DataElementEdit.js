@@ -166,7 +166,7 @@ class DataElementEdit extends Component {
   }
 
   render() {
-    const { registry } = this.props;
+    const { registry, extensionConfigurations } = this.props;
 
     const { waitingForExtensionResponse, errors, dataElement } = this.state;
 
@@ -175,6 +175,8 @@ class DataElementEdit extends Component {
       'dataElements',
       dataElement.get('modulePath')
     ]);
+
+    const extensionName = dataElement.get('modulePath').split('/')[0];
 
     return (
       <div className="pure-g component-edit-container">
@@ -283,6 +285,9 @@ class DataElementEdit extends Component {
         <div className="pure-u-3-4">
           <ComponentIframe
             component={componentIframeDetails}
+            extensionConfiguration={extensionConfigurations
+              .filter(i => i.get('name') === extensionName)
+              .first()}
             settings={dataElement.get('settings')}
             server={registry.getIn(['environment', 'server'])}
           />
@@ -296,7 +301,8 @@ const mapState = state => {
   return {
     dataElements: state.dataElements,
     currentIframe: state.currentIframe,
-    registry: state.registry
+    registry: state.registry,
+    extensionConfigurations: state.extensionConfigurations
   };
 };
 
