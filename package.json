@@ -10,7 +10,7 @@
     "react-redux": "^7.0.2",
     "react-router-dom": "^5.0.0",
     "react-router-last-location": "^1.1.0",
-    "react-scripts": "^2.1.8"
+    "react-scripts": "^5.0.1"
   },
   "devDependencies": {
     "eslint-config-airbnb": "^17.1.0",
